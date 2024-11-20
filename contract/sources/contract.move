@@ -1,4 +1,3 @@
-/*
-/// Module: contract
-module contract::contract;
-*/
+module contract::sui_activity {
+
+}

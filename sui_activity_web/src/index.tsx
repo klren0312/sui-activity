@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { Main } from './main';
-import './index.css'
+import '/@/assets/less/basic.less'
 
 
 const container = document.querySelector('#root');
