@@ -3,11 +3,9 @@ import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { networkConfig } from '/@/utils/networkConfig'
 import { ConfigProvider } from 'antd'
-import PageLayout from '/@/components/Layout'
+import PageLayout from './components/Layout'
 import '/@/assets/less/basic.less'
 import '/@/assets/less/tailwind.css'
-
-
 
 const queryClient = new QueryClient()
 const container = document.querySelector('#root')

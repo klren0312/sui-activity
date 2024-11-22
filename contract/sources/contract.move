@@ -2,7 +2,7 @@
 module contract::sui_activity {
   use sui::bag::{Self, Bag};
   use sui::table::{Self, Table, contains, borrow_mut, add, remove};
-  use sui::coin::{value, Coin, join};
+  use sui::coin::{value, Coin, join, split};
   use sui::dynamic_object_field as ofield;
   use sui::url::{Url, new_unsafe_from_bytes};
   use std::string::{utf8, String};
@@ -13,7 +13,7 @@ module contract::sui_activity {
   // 支付价格不够
   const ErrorAmountNotEnough: u64 = 2;
 
-  public struct MarketNft has key, store {
+  public struct MarketNft has key {
     id: UID,
     name: String,
     description: String,
@@ -40,10 +40,10 @@ module contract::sui_activity {
   // 传入币的类型
   // https://suiscan.xyz/testnet/tx/CjePrxVHMNgro7i32eACzSEi8NL5sLS83iqM7zBm1x36
   // marketspace objectid 0xa4b4ea307352889b691ae5f6f33b7c73efd3219ab6f55aeb5fcf85babdba42f5
-  public entry fun create_market<COIN>(name: String, ctx: &mut TxContext) {
+  public entry fun create_market<T>(name: String, ctx: &mut TxContext) {
     let id = object::new(ctx);
     let items = bag::new(ctx);
-    let payments = table::new<address, Coin<COIN>>(ctx);
+    let payments = table::new<address, Coin<T>>(ctx);
     // 发送商店nft
     let marketNft = MarketNft {
       id: object::new(ctx),
@@ -52,19 +52,19 @@ module contract::sui_activity {
       url: new_unsafe_from_bytes(b"https://aggregator.walrus-testnet.walrus.space/v1/_4ApAD7Xujmz6YxCKIdvYf-mXa0x050LqV93qTm4Q20"),
       market_amount: 1,
     };
-    transfer::share_object(Marketplace<COIN> {
+    transfer::share_object(Marketplace<T> {
       id,
       items,
       payments
     });
-    transfer::public_transfer(marketNft, tx_context::sender(ctx));
+    transfer::transfer(marketNft, tx_context::sender(ctx));
   }
 
   // 将物品添加到市场的列表中
   // 被卖物品的type，币的type，市场对象id，被卖物品id，售价
   // https://suiscan.xyz/testnet/tx/3mJQstW9KhTZccHckWUuxYN79MWyktjParzVhKwGCkee
-  public entry fun list<T: key + store, COIN>(
-    marketplace: &mut Marketplace<COIN>,
+  public entry fun list<T: key + store, K>(
+    marketplace: &mut Marketplace<K>,
     item: T,
     sell_price_amount: u64,
     ctx: &mut TxContext
@@ -82,8 +82,8 @@ module contract::sui_activity {
   }
 
   // 把物品从列表中移除，并返回物品；只能所有者进行这个操作
-  fun delist<T: key + store, COIN>(
-    marketplace: &mut Marketplace<COIN>,
+  fun delist<T: key + store,  K>(
+    marketplace: &mut Marketplace<K>,
     item_id: ID,
     ctx: &TxContext
   ): T {
@@ -104,40 +104,43 @@ module contract::sui_activity {
   // 列表移除物品，并发送给所有人
   // 物品类型，币类型，市场objectid，物品id
   // https://suiscan.xyz/testnet/tx/38qQCT9LsoNH98eJcQJdK6R9aK5S1WZPbiNpoMyii7ro
-  public entry fun delist_and_take<T: key + store, COIN>(
-    marketplace: &mut Marketplace<COIN>,
+  public entry fun delist_and_take<T: key + store, K>(
+    marketplace: &mut Marketplace<K>,
     item_id: ID,
     ctx: &mut TxContext
   ) {
     // 从列表中移除物品
-    let item = delist<T, COIN>(marketplace, item_id, ctx);
+    let item = delist<T, K>(marketplace, item_id, ctx);
     // 发送物品到所有人
     transfer::public_transfer(item, tx_context::sender(ctx));
   }
 
   // 购买物品，记录交易
-  fun buy<T: key + store, COIN>(
-    marketplace: &mut Marketplace<COIN>,
+  fun buy<T: key + store, K>(
+    marketplace: &mut Marketplace<K>,
     item_id: ID,
-    paid: Coin<COIN>
+    paid: &mut Coin<K>,
+    ctx: &mut TxContext
   ): T {
-    // 从bag中取出物品
+
     let Listing {
       mut id,
       sell_price_amount,
       owner,
     } = bag::remove(&mut marketplace.items, item_id);
-    // 出的价格低于售价报错
-    assert!(sell_price_amount < value(&paid), ErrorAmountNotEnough);
+
+    assert!(sell_price_amount < value(paid), ErrorAmountNotEnough);
+
+    let split_coin = split(paid, sell_price_amount, ctx);
     // 检查交易记录中是否有跟当前地址关联的记录，有就合并
     // 没有就新增
-    if (contains<address, Coin<COIN>>(&marketplace.payments, owner)) {
+    if (contains<address, Coin<K>>(&marketplace.payments, owner)) {
       join(
-        borrow_mut<address, Coin<COIN>>(&mut marketplace.payments, owner),
-        paid
+        borrow_mut<address, Coin<K>>(&mut marketplace.payments, owner),
+        split_coin
       )
     } else {
-      add(&mut marketplace.payments, owner, paid)
+      add(&mut marketplace.payments, owner, split_coin)
     };
 
     let item = ofield::remove(&mut id, true);
@@ -146,14 +149,14 @@ module contract::sui_activity {
   }
 
   // 购买物品并转发物品给当前地址
-  public entry fun buy_and_take<T: key + store, COIN>(
-    marketplace: &mut Marketplace<COIN>,
+  public entry fun buy_and_take<T: key + store, K>(
+    marketplace: &mut Marketplace<K>,
     item_id: ID,
-    paid: Coin<COIN>,
+    paid: &mut Coin<K>,
     ctx: &mut TxContext
   ) {
     transfer::public_transfer(
-      buy<T, COIN>(marketplace, item_id, paid),
+      buy<T, K>(marketplace, item_id, paid, ctx),
       tx_context::sender(ctx)
     )
   }

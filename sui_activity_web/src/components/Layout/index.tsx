@@ -1,18 +1,19 @@
 import { Layout, Menu } from 'antd'
-import router from '../routers/router'
+import router from '../../routers/router'
 import React from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { ConnectButton } from '@mysten/dapp-kit'
 import '@mysten/dapp-kit/dist/index.css'
-const { Header, Content, Footer } = Layout
+import './style.less'
+const { Header, Content } = Layout
 
 export default function PageLayout() {
   return (
     <Layout>
-      <Header className="flex items-center justify-between px-5">
+      <Header className="page-header flex items-center justify-between px-5">
         <div className="flex items-center">
-          <img className="w-10 h-10" src="/logo.svg" alt="logo" />
-          <div className="ml-5 text-white font-bold text-xl">Sui-Activity</div>
+          <img className="w-10 h-10" src="/logo-transparent.svg" alt="logo" />
+          <div className="page-title ml-5 text-white font-bold text-xl">Sui-Activity</div>
           {/* <Menu
             theme="dark"
             mode="horizontal"
@@ -23,16 +24,13 @@ export default function PageLayout() {
         </div>
         <ConnectButton className="reset-connect-button" connectText="使用钱包登录"></ConnectButton>
       </Header>
-      <Content style={{ padding: '20px 20px 0', height: 'calc(100vh - 132px)' }}>
+      <Content className="p-2" style={{ height: 'calc(100vh - 63px)' }}>
         <div className="h-full p-5 bg-white rounded-md">
           <React.StrictMode>
             <RouterProvider router={router} future={{v7_startTransition: true}}/>
           </React.StrictMode>
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        ZZES ©{new Date().getFullYear()} 求真 务实 坚韧 无畏 POWER BY <a href="https://walrus.xyz" target="_blank">WALRUS. </a>
-      </Footer>
     </Layout>
   )
 }
