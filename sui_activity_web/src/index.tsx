@@ -28,7 +28,9 @@ if (container) {
     >
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider>
+          <WalletProvider stashedWallet={{
+            name: 'SuiHi-随嗨'
+          }}>
             <PageLayout />
           </WalletProvider>
         </SuiClientProvider>

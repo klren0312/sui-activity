@@ -1,4 +1,4 @@
-import { Layout, Menu } from 'antd'
+import { Layout } from 'antd'
 import router from '../../routers/router'
 import React from 'react'
 import { RouterProvider } from 'react-router-dom'
@@ -13,7 +13,7 @@ export default function PageLayout() {
       <Header className="page-header flex items-center justify-between px-5">
         <div className="flex items-center">
           <img className="w-10 h-10" src="/logo-transparent.svg" alt="logo" />
-          <div className="page-title ml-5 text-white font-bold text-xl">Sui-Activity</div>
+          <div className="page-title ml-5 text-white font-bold text-xl">SuiHi 随嗨</div>
           {/* <Menu
             theme="dark"
             mode="horizontal"

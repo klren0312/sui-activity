@@ -9,29 +9,30 @@
     "clean": "farm clean"
   },
   "dependencies": {
-    "@mysten/dapp-kit": "^0.14.36",
-    "@mysten/sui": "^1.14.4",
-    "@tanstack/react-query": "^5.60.5",
-    "antd": "^5.22.1",
+    "@mysten/dapp-kit": "^0.14.38",
+    "@mysten/enoki": "^0.4.12",
+    "@mysten/sui": "^1.15.0",
+    "@tanstack/react-query": "^5.61.0",
+    "antd": "^5.22.2",
     "clsx": "^1.2.1",
-    "react": "18",
-    "react-dom": "18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
-    "@farmfe/cli": "^1.0.1",
-    "@farmfe/core": "^1.1.1",
+    "@farmfe/cli": "^1.0.4",
+    "@farmfe/core": "^1.4.2",
     "@farmfe/js-plugin-less": "^1.10.0",
     "@farmfe/js-plugin-postcss": "^1.9.0",
-    "@farmfe/plugin-react": "^1.0.1",
+    "@farmfe/plugin-react": "^1.2.6",
     "@farmfe/plugin-strip": "^0.0.6",
-    "@types/react": "18",
-    "@types/react-dom": "18",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
-    "core-js": "^3.36.1",
+    "core-js": "^3.39.0",
     "postcss": "^8.4.49",
-    "react-refresh": "^0.14.0",
+    "react-refresh": "^0.14.2",
     "tailwindcss": "^3.4.15"
   }
 }
