@@ -7,6 +7,7 @@ module contract::sui_hai {
   use sui::balance::{Self, zero, Balance};
   use sui::vec_set::{VecSet, empty};
   use sui::table::{Self, Table};
+  use sui::package::{claim_and_keep}
   use contract::member::{create_member_nft, MemberNft};
   use contract::activity::{Activity, create_activity};
 
@@ -40,6 +41,7 @@ module contract::sui_hai {
       activity_cash_pledge: table::new<Activity, Coin<SUI>>(ctx),
       activity_max_join_fee: 100_000_000_000
     };
+    claim_and_keep(SHIHAI, tx_context::sender(ctx));
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::share_object(suiHaiServer);
