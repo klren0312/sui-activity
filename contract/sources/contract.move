@@ -6,13 +6,14 @@ module contract::sui_hai {
   use std::string::{utf8, String};
   use sui::balance::{Self, zero, Balance};
   use sui::vec_set::{VecSet, empty};
+  use sui::table::{Self, Table};
   use contract::member::{create_member_nft, MemberNft};
-  use contract::activity::{create_activity};
+  use contract::activity::{Activity, create_activity};
 
-  // 当前会员已存在
-  const ErrorAlreadyHasMember: u64 = 0;
   // 存的钱和数量不符
-  const ErrorDepositNotEnough: u64 = 1;
+  const ErrorDepositNotEnough: u64 = 0;
+
+  public struct SUIHAI has drop {}
 
  // 管理员权限
   public struct AdminCap has key {
@@ -24,18 +25,20 @@ module contract::sui_hai {
     id: UID,
     name: String,
     pool_balance: Balance<SUI>, // 资金池
-    members: VecSet<address>, // 平台成员
     activity_fee: u64, // 活动提现手续费， 总价 / 手续费 = 提现的费用
+    activity_cash_pledge: Table<Activity, Coin<SUI>> // 活动押金
+    activity_max_join_fee: u64 // 活动收费最高限制
   }
 
   // 初始化，创建系统
-  fun init (ctx: &mut TxContext) {
+  fun init (witness: SHIHAI, ctx: &mut TxContext) {
     let suiHaiServer = SuiHaiServer {
       id: object::new(ctx),
       name: utf8(b"SUI-HAI-SERVER"),
       pool_balance: zero(), // 资金池
-      members: empty(),
-      activity_fee: 1000
+      activity_fee: 10000, // 万一手续费
+      activity_cash_pledge: table::new<Activity, Coin<SUI>>(ctx),
+      activity_max_join_fee: 100_000_000_000
     };
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
@@ -49,60 +52,6 @@ module contract::sui_hai {
     fee: u64
   ) {
     sui_hai_server.activity_fee = fee;
-  }
-
-  // 会员注册
-  public fun add_memeber (
-    sui_hai_server: &mut SuiHaiServer,
-    name: String,
-    description: String,
-    sex: u8,
-    avatar: Url,
-    ctx: &mut TxContext
-  ) {
-    // 已经注册过的，不给再注册了
-    if (sui_hai_server.members.contains(&ctx.sender())) {
-      abort ErrorAlreadyHasMember
-    };
-    create_member_nft(
-      name,
-      description,
-      sex,
-      avatar,
-      ctx
-    );
-    // 地址存入会员数组
-    sui_hai_server.members.insert(ctx.sender());
-  }
-
-  // 创建活动
-  public fun add_activity (
-    _: &MemberNft,
-    title: String, // 活动标题
-    description: String, // 描述
-    date_range: vector<String>, // 时间范围
-    location: String, // 地点
-    tag: String, // 分类
-    total_people_num: u64, // 人数
-    join_fee: u64,
-    media: VecSet<String>, // 参与费用
-    start_coin: Coin<SUI>, // 启动资金
-    ctx: &mut TxContext
-  ) {
-    // 启动资金提取到余额
-    let start_coin_balance = coin::into_balance(start_coin);
-    // 创建活动
-    create_activity(title,
-      description,
-      date_range,
-      location,
-      tag,
-      total_people_num,
-      join_fee,
-      media,
-      start_coin_balance,
-      ctx
-    );
   }
 
   // 服务器存钱

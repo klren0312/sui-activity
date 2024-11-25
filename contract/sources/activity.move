@@ -1,8 +1,9 @@
 module contract::activity {
   use std::string::String;
   use sui::vec_set::{empty, VecSet};
-  use sui::balance::{Balance};
+  use sui::balance::{Self, Balance};
   use sui::sui::SUI;
+  use contract::member::{MemberNft}
 
   public struct AdminCap has key {
     id: UID
@@ -24,7 +25,8 @@ module contract::activity {
   }
 
   // 创建活动
-  public(package) fun create_activity (
+  public fun create_activity (
+    _: &MemberNft,
     title: String, // 活动标题
     description: String, // 描述
     date_range: vector<String>, // 时间范围
@@ -33,7 +35,6 @@ module contract::activity {
     total_people_num: u64, // 人数
     join_fee: u64,  // 参与费用
     media: VecSet<String>, // 图片
-    total_price: Balance<SUI>, // 总活动资金
     ctx: &mut TxContext
   ) {
     let activity = Activity {
@@ -47,7 +48,7 @@ module contract::activity {
       join_fee,
       join_memeber: empty(),
       media,
-      total_price,
+      total_price: balance.zero().
     };
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));

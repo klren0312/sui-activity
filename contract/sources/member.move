@@ -1,6 +1,10 @@
 module contract::member {
   use std::string::{String};
   use sui::url::{Url};
+  use contract::sui_hai::{SuiHaiServer}
+
+ // 当前会员已存在
+  const ErrorAlreadyHasMember: u64 = 0;
 
   public struct MemberNft has key {
     id: UID,
@@ -8,6 +12,28 @@ module contract::member {
     description: String,
     sex: u8,
     avatar: Url,
+  }
+
+  // 会员注册
+  public fun add_memeber (
+    sui_hai_server: &mut SuiHaiServer,
+    name: String,
+    description: String,
+    sex: u8,
+    avatar: Url,
+    ctx: &mut TxContext
+  ) {
+    // 已经注册过的，不给再注册了
+    if (sui_hai_server.members.contains(&ctx.sender())) {
+      abort ErrorAlreadyHasMember
+    };
+    create_member_nft(
+      name,
+      description,
+      sex,
+      avatar,
+      ctx
+    );
   }
 
   // 会员专属nft
