@@ -1,7 +1,7 @@
 import { getFullnodeUrl } from '@mysten/sui/client'
 import {
-	TESTNET_COUNTER_PACKAGE_ID,
-	MAINNET_COUNTER_PACKAGE_ID,
+	TESTNET_PACKAGE_ID,
+	DEVNET_PACKAGE_ID,
 } from './constants'
 import { createNetworkConfig } from '@mysten/dapp-kit'
 
@@ -23,15 +23,15 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
 			PUBLIC: https://fullnode.testnet.sui.io
 		 */
 		testnet: {
-			url: 'https://sui-testnet-endpoint.blockvision.org/',
+			url: getFullnodeUrl('testnet'),
 			variables: {
-				packageId: TESTNET_COUNTER_PACKAGE_ID,
+				packageId: TESTNET_PACKAGE_ID,
 			},
 		},
-		mainnet: {
-			url: getFullnodeUrl('mainnet'),
+		devnet: {
+			url: getFullnodeUrl('devnet'),
 			variables: {
-				packageId: MAINNET_COUNTER_PACKAGE_ID,
+				packageId: DEVNET_PACKAGE_ID,
 			},
 		},
 	})

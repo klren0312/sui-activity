@@ -27,10 +27,12 @@ if (container) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider stashedWallet={{
-            name: 'SuiHi-随嗨'
-          }}>
+        <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
+          <WalletProvider
+            stashedWallet={{
+              name: 'SuiHi-随嗨'
+            }}
+          >
             <PageLayout />
           </WalletProvider>
         </SuiClientProvider>
