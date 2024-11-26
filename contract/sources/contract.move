@@ -5,16 +5,17 @@ module contract::sui_hai {
   use sui::url::{Url};
   use std::string::{utf8, String};
   use sui::balance::{Self, zero, Balance};
-  use sui::vec_set::{VecSet, empty};
   use sui::table::{Self, Table};
-  use sui::package::{claim_and_keep}
-  use contract::member::{create_member_nft, MemberNft};
-  use contract::activity::{Activity, create_activity};
+  use sui::package::{claim_and_keep};
+  use contract::member::{create_member_nft, get_member_struct, Member};
 
   // 存的钱和数量不符
   const ErrorDepositNotEnough: u64 = 0;
 
-  public struct SUIHAI has drop {}
+   // 当前会员已存在
+  const ErrorAlreadyHasMember: u64 = 1;
+
+  public struct SUI_HAI has drop {}
 
  // 管理员权限
   public struct AdminCap has key {
@@ -27,21 +28,21 @@ module contract::sui_hai {
     name: String,
     pool_balance: Balance<SUI>, // 资金池
     activity_fee: u64, // 活动提现手续费， 总价 / 手续费 = 提现的费用
-    activity_cash_pledge: Table<Activity, Coin<SUI>> // 活动押金
+    members: Table<address, Member>,
     activity_max_join_fee: u64 // 活动收费最高限制
   }
 
   // 初始化，创建系统
-  fun init (witness: SHIHAI, ctx: &mut TxContext) {
+  fun init (witness: SUI_HAI, ctx: &mut TxContext) {
     let suiHaiServer = SuiHaiServer {
       id: object::new(ctx),
       name: utf8(b"SUI-HAI-SERVER"),
       pool_balance: zero(), // 资金池
       activity_fee: 10000, // 万一手续费
-      activity_cash_pledge: table::new<Activity, Coin<SUI>>(ctx),
+      members: table::new<address, Member>(ctx),
       activity_max_join_fee: 100_000_000_000
     };
-    claim_and_keep(SHIHAI, tx_context::sender(ctx));
+    claim_and_keep(witness, ctx);
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::share_object(suiHaiServer);
@@ -89,5 +90,35 @@ module contract::sui_hai {
       let output_balance = balance::split(&mut sui_hai_server.pool_balance, amount);
       let output = coin::from_balance(output_balance, ctx);
       transfer::public_transfer(output, tx_context::sender(ctx));
+  }
+
+    // 会员注册
+  public fun add_memeber (
+    sui_hai_server: &mut SuiHaiServer,
+    name: String,
+    description: String,
+    sex: u8,
+    avatar: Url,
+    ctx: &mut TxContext
+  ) {
+    // 已经注册过的，不给再注册了
+    if (sui_hai_server.members.contains(ctx.sender())) {
+      abort ErrorAlreadyHasMember
+    };
+    let member = get_member_struct(
+      name,
+      description,
+      sex,
+      avatar,
+    );
+    // 添加会员信息到总服务器
+    sui_hai_server.members.add(ctx.sender(), member);
+    create_member_nft(
+      name,
+      description,
+      sex,
+      avatar,
+      ctx
+    );
   }
 }

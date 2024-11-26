@@ -1,11 +1,16 @@
 module contract::member {
   use std::string::{String};
   use sui::url::{Url};
-  use contract::sui_hai::{SuiHaiServer}
 
- // 当前会员已存在
-  const ErrorAlreadyHasMember: u64 = 0;
+  // 会员信息结构体
+  public struct Member has store, copy {
+    name: String,
+    description: String,
+    sex: u8,
+    avatar: Url,
+  }
 
+  // 会员nft结构体
   public struct MemberNft has key {
     id: UID,
     name: String,
@@ -14,26 +19,18 @@ module contract::member {
     avatar: Url,
   }
 
-  // 会员注册
-  public fun add_memeber (
-    sui_hai_server: &mut SuiHaiServer,
+  public(package) fun get_member_struct (
     name: String,
     description: String,
     sex: u8,
     avatar: Url,
-    ctx: &mut TxContext
-  ) {
-    // 已经注册过的，不给再注册了
-    if (sui_hai_server.members.contains(&ctx.sender())) {
-      abort ErrorAlreadyHasMember
-    };
-    create_member_nft(
+  ): Member {
+    Member {
       name,
       description,
       sex,
-      avatar,
-      ctx
-    );
+      avatar
+    }
   }
 
   // 会员专属nft

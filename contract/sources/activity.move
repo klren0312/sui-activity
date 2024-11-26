@@ -1,9 +1,9 @@
 module contract::activity {
   use std::string::String;
   use sui::vec_set::{empty, VecSet};
-  use sui::balance::{Self, Balance};
+  use sui::balance::{zero, Balance};
   use sui::sui::SUI;
-  use contract::member::{MemberNft}
+  use contract::member::{MemberNft};
 
   public struct AdminCap has key {
     id: UID
@@ -48,7 +48,7 @@ module contract::activity {
       join_fee,
       join_memeber: empty(),
       media,
-      total_price: balance.zero().
+      total_price: zero(),
     };
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
