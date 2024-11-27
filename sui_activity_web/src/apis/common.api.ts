@@ -1,6 +1,6 @@
 import { UploadWalrusResponse } from './types/common.type'
 import request from '/@/utils/request'
-import { getRandomInt } from '/@/utils/tools'
+// import { getRandomInt } from '/@/utils/tools'
 import mime from 'mime'
 // import { WALRUS_PUBLISHER } from '../utils/constants'
 

@@ -2,7 +2,6 @@
 module contract::sui_hai {
   use sui::coin::{Self, value, Coin};
   use sui::sui::SUI;
-  use sui::url::{Url};
   use std::string::{utf8, String};
   use sui::balance::{Self, zero, Balance};
   use sui::table::{Self, Table};
@@ -93,23 +92,26 @@ module contract::sui_hai {
   }
 
     // 会员注册
-  public fun add_memeber (
+  public entry fun add_memeber (
     sui_hai_server: &mut SuiHaiServer,
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
     ctx: &mut TxContext
   ) {
     // 已经注册过的，不给再注册了
     if (sui_hai_server.members.contains(ctx.sender())) {
       abort ErrorAlreadyHasMember
     };
+    let index = sui_hai_server.members.length();
+    let current_index = index + 1;
     let member = get_member_struct(
       name,
       description,
       sex,
       avatar,
+      current_index,
     );
     // 添加会员信息到总服务器
     sui_hai_server.members.add(ctx.sender(), member);
@@ -118,7 +120,8 @@ module contract::sui_hai {
       description,
       sex,
       avatar,
-      ctx
+      current_index,
+      ctx,
     );
   }
 }

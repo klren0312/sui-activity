@@ -1,13 +1,14 @@
 module contract::member {
   use std::string::{String};
-  use sui::url::{Url};
+  use sui::url::{Url, new_unsafe_from_bytes};
 
   // 会员信息结构体
   public struct Member has store, copy {
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
+    index: u64,
   }
 
   // 会员nft结构体
@@ -15,21 +16,25 @@ module contract::member {
     id: UID,
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
+    url: Url,
+    index: u64,
   }
 
   public(package) fun get_member_struct (
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
+    index: u64,
   ): Member {
     Member {
       name,
       description,
       sex,
-      avatar
+      avatar,
+      index,
     }
   }
 
@@ -37,8 +42,9 @@ module contract::member {
   public(package) fun create_member_nft (
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
+    index: u64,
     ctx: &mut TxContext
   ) {
     let nft = MemberNft {
@@ -47,6 +53,8 @@ module contract::member {
       description: description,
       sex: sex,
       avatar: avatar,
+      url: new_unsafe_from_bytes(b"https://aggregator.walrus-testnet.walrus.space/v1/iLHp_40XlzSXUfdVaT8hTRH__x_YAvggBzHeuB7hR1U"),
+      index: index,
     };
     transfer::transfer(nft, tx_context::sender(ctx));
   }
@@ -56,13 +64,15 @@ module contract::member {
     nft: &mut MemberNft,
     name: String,
     description: String,
-    sex: u8,
-    avatar: Url,
+    sex: String,
+    avatar: String,
+    index: u64,
   ) {
     nft.name = name;
     nft.description = description;
     nft.sex = sex;
     nft.avatar = avatar;
+    nft.index = index;
   }
 
   // 删除会员
@@ -76,6 +86,8 @@ module contract::member {
       description: _,
       sex: _,
       avatar: _,
+      url: _,
+      index: _,
     } = nft;
     object::delete(id);
   }

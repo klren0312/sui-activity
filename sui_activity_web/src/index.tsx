@@ -29,6 +29,7 @@ if (container) {
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
           <WalletProvider
+            autoConnect
             stashedWallet={{
               name: 'SuiHi-随嗨'
             }}

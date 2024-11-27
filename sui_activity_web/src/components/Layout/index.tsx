@@ -45,7 +45,7 @@ export default function PageLayout() {
         </div>
       </Content>
       <Modal title="Basic Modal" open={isRegisterModalOpen} onOk={handleRegisterMember} onCancel={() => setIsRegisterModalOpen(false)}>
-        <RegisterForm ref={registerFormRef}></RegisterForm>
+        <RegisterForm ref={registerFormRef} onSuccess={() => setIsRegisterModalOpen(false)}></RegisterForm>
       </Modal>
     </Layout>
   )

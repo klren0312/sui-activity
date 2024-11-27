@@ -4,9 +4,23 @@ import ImgCrop from 'antd-img-crop'
 import TextArea from 'antd/es/input/TextArea'
 import { UploadImageApi } from '../apis/common.api'
 import { forwardRef, useImperativeHandle } from 'react'
+import { Transaction } from '@mysten/sui/transactions'
+import { useNetworkVariable } from '../utils/networkConfig'
+import { SUI_HAI_SERVER, WALRUS_AGGREGATOR } from '../utils/constants'
+import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
+import { message } from 'antd'
 
-const RegisterForm = forwardRef((_, ref) => {
+interface RegisterFormProps {
+  onSuccess: () => void
+}
+
+const RegisterForm = forwardRef(({onSuccess}: RegisterFormProps, ref) => {
+  const [messageApi, contextHolder] = message.useMessage()
   const [form] = Form.useForm()
+  const packageId = useNetworkVariable('packageId')
+
+
+  const { mutate } = useSignAndExecuteTransaction()
   useImperativeHandle(ref, () => ({
     submitForm: () => form.submit(),
   }))
@@ -32,9 +46,37 @@ const RegisterForm = forwardRef((_, ref) => {
   }
   const onFinish = (values: any) => {
     console.log(values)
+    const txb = new Transaction()
+    txb.moveCall({
+      target: `${packageId}::sui_hai::add_memeber`,
+      arguments: [
+        txb.object(SUI_HAI_SERVER),
+        txb.pure.string(values.name),
+        txb.pure.string(values.description),
+        txb.pure.string(values.sex),
+        txb.pure.string(WALRUS_AGGREGATOR[0] +values.avatar),
+      ]
+    })
+    mutate(
+      {
+        transaction: txb
+      },
+      {
+        onError: (err) => {
+          console.log(err.message)
+          messageApi.error(err.message)
+        },
+        onSuccess: (result) => {
+          form.resetFields()
+          onSuccess()
+          messageApi.success(`注册成功: ${result.digest}`)
+        },
+      }
+    )
   }
   return (
     <>
+      {contextHolder}
       <Form
         form={form}
         labelCol={{ span: 4 }}
