@@ -6,6 +6,7 @@ import { ConfigProvider } from 'antd'
 import PageLayout from './components/Layout'
 import '/@/assets/less/basic.less'
 import '/@/assets/less/tailwind.css'
+import zhCN from 'antd/locale/zh_CN'
 
 const queryClient = new QueryClient()
 const container = document.querySelector('#root')
@@ -15,6 +16,7 @@ if (container) {
 
   root.render(
     <ConfigProvider
+      locale={zhCN}
       theme={{
         token: {
           // Seed Token，影响范围大

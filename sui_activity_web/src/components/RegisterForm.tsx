@@ -19,7 +19,6 @@ const RegisterForm = forwardRef(({onSuccess}: RegisterFormProps, ref) => {
   const [form] = Form.useForm()
   const packageId = useNetworkVariable('packageId')
 
-
   const { mutate } = useSignAndExecuteTransaction()
   useImperativeHandle(ref, () => ({
     submitForm: () => form.submit(),

@@ -2,6 +2,9 @@ module contract::member {
   use std::string::{String};
   use sui::url::{Url, new_unsafe_from_bytes};
 
+  // 当前会员不匹配
+  const ErrorMemberNotMatch: u64 = 0;
+
   // 会员信息结构体
   public struct Member has store, copy {
     name: String,
@@ -67,7 +70,9 @@ module contract::member {
     sex: String,
     avatar: String,
     index: u64,
+    ctx: &mut TxContext
   ) {
+    assert!(tx_context::sender(ctx) == object::uid_to_address(&nft.id), ErrorMemberNotMatch); 
     nft.name = name;
     nft.description = description;
     nft.sex = sex;
@@ -78,8 +83,9 @@ module contract::member {
   // 删除会员
   public entry fun delete_memeber_nft (
     nft: MemberNft,
-    _: &mut TxContext 
+    ctx: &mut TxContext 
   ) {
+    assert!(tx_context::sender(ctx) == object::uid_to_address(&nft.id), ErrorMemberNotMatch);
     let MemberNft {
       id,
       name: _,
