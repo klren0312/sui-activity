@@ -20,6 +20,7 @@ const RegisterForm = forwardRef(({onSuccess}: RegisterFormProps, ref) => {
   const packageId = useNetworkVariable('packageId')
 
   const { mutate } = useSignAndExecuteTransaction()
+  // 暴露给父组件的方法
   useImperativeHandle(ref, () => ({
     submitForm: () => form.submit(),
   }))
