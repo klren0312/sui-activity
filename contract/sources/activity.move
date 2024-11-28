@@ -1,12 +1,34 @@
 module contract::activity {
-  use std::string::String;
+  use std::string::{String, utf8};
   use sui::vec_set::{empty, VecSet};
   use sui::balance::{zero, Balance};
   use sui::sui::SUI;
+  use sui::event;
+  use sui::coin::{Coin, into_balance, value};
   use contract::member::{MemberNft};
+  use sui::url::{Url, new_unsafe};
+
+  // 参加活动费用不足
+  const ErrorJoinFeeNotEnough: u64 = 0;
+  // 活动人数已满
+  const ErrorActivityFull: u64 = 1;
+  // 会员未参与活动
+  const ErrorMemberNotJoinActivity: u64 = 2;
+  // 当前nft不匹配当前活动
+  const ErrorNftNotMatchActivity: u64 = 3;
 
   public struct AdminCap has key {
     id: UID
+  }
+
+  // 创建活动事件
+  public struct CreateActivityEvent has copy, drop {
+    creator: address,
+    title: String,
+    description: String,
+    date_range: vector<String>,
+    location: String,
+    tag: String,
   }
 
   // 活动结构
@@ -20,8 +42,20 @@ module contract::activity {
     total_people_num: u64, // 人数
     join_fee: u64, // 参与费用
     join_memeber: VecSet<address>, // 参加的成员列表
-    media: VecSet<String>, // 媒体文件 图片
+    media: vector<String>, // 媒体文件 图片
     total_price: Balance<SUI>, // 总活动资金
+  }
+
+  // 参与活动nft
+  public struct JoinActivityNft has key {
+    id: UID,
+    activity_addr: address,
+    name: String,
+    url: Url,
+    activity_title: String,
+    join_time: String,
+    check_in: bool, // 是否已签到
+    index: u64, // 序号
   }
 
   // 创建活动
@@ -34,7 +68,7 @@ module contract::activity {
     tag: String, // 分类
     total_people_num: u64, // 人数
     join_fee: u64,  // 参与费用
-    media: VecSet<String>, // 图片
+    media: vector<String>, // 图片
     ctx: &mut TxContext
   ) {
     let activity = Activity {
@@ -53,6 +87,15 @@ module contract::activity {
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::public_share_object(activity);
+    // 创建活动事件
+    event::emit(CreateActivityEvent {
+      creator: ctx.sender(),
+      title,
+      description,
+      date_range,
+      location,
+      tag,
+    });
   }
 
   // 更新活动信息
@@ -66,7 +109,7 @@ module contract::activity {
     tag: String,
     total_people_num: u64,
     join_fee: u64,
-    media: VecSet<String>,
+    media: vector<String>,
   ) {
     activity.title = title;
     activity.description = description;
@@ -76,5 +119,57 @@ module contract::activity {
     activity.total_people_num = total_people_num;
     activity.join_fee = join_fee;
     activity.media = media;
+  }
+
+  // 参加活动
+  public fun join_activity (
+    _: &MemberNft,
+    activity: &mut Activity,
+    join_coin: Coin<SUI>,
+    join_time: String,
+    ctx: &mut TxContext,
+  ) {
+    // 活动人数已满
+    assert!(activity.join_memeber.size() < activity.total_people_num, ErrorActivityFull);
+    let join_coin_value = value(&join_coin);
+    // 判断是否
+    assert!(join_coin_value >= activity.join_fee, ErrorJoinFeeNotEnough);
+    let join_coin_balance = into_balance(join_coin);
+    // 成员加入列表
+    activity.join_memeber.insert(ctx.sender());
+    // 费用存入池中
+    activity.total_price.join(join_coin_balance);
+    let index = activity.join_memeber.size() + 1;
+    let mut name = utf8(b"SUI-HAI-");
+    name.append(activity.title);
+    name.append(b"#".to_string());
+    name.append(index.to_string());
+    // 创建参与活动nft
+    let join_activity_nft = JoinActivityNft {
+      id: object::new(ctx),
+      activity_addr: activity.id.to_address(),
+      name,
+      url: new_unsafe(activity.media[0].to_ascii()),
+      activity_title: activity.title,
+      join_time,
+      check_in: false,
+      index,
+    };
+    transfer::transfer(join_activity_nft, ctx.sender());
+  }
+
+  // 签到
+  public fun check_in (
+    join_activity_nft: &mut JoinActivityNft,
+    activity: &mut Activity,
+    ctx: &mut TxContext,
+  ) {
+    // 判断会员是否参与了当前活动
+    assert!(activity.join_memeber.contains(&ctx.sender()), ErrorMemberNotJoinActivity);
+    // 判断nft是否属于当前活动
+    assert!(join_activity_nft.activity_addr == activity.id.to_address(), ErrorNftNotMatchActivity);
+
+    // 签到
+    join_activity_nft.check_in = true;
   }
 }

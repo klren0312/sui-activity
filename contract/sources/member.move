@@ -1,13 +1,13 @@
 module contract::member {
-  use std::string::{String};
-  use sui::url::{Url, new_unsafe_from_bytes};
+  use std::string::{String, utf8};
+  use sui::url::{Url, new_unsafe};
 
   // 当前会员不匹配
   const ErrorMemberNotMatch: u64 = 0;
 
   // 会员信息结构体
   public struct Member has store, copy {
-    name: String,
+    nickname: String,
     description: String,
     sex: String,
     avatar: String,
@@ -18,6 +18,7 @@ module contract::member {
   public struct MemberNft has key {
     id: UID,
     name: String,
+    nickname: String,
     description: String,
     sex: String,
     avatar: String,
@@ -26,14 +27,14 @@ module contract::member {
   }
 
   public(package) fun get_member_struct (
-    name: String,
+    nickname: String,
     description: String,
     sex: String,
     avatar: String,
     index: u64,
   ): Member {
     Member {
-      name,
+      nickname,
       description,
       sex,
       avatar,
@@ -43,20 +44,26 @@ module contract::member {
 
   // 会员专属nft
   public(package) fun create_member_nft (
-    name: String,
+    nickname: String,
     description: String,
     sex: String,
     avatar: String,
     index: u64,
     ctx: &mut TxContext
   ) {
+    let mut name = utf8(b"SUI-HAI-MEMBER");
+    name.append(nickname);
+    name.append(utf8(b"#"));
+    name.append(index.to_string());
+
     let nft = MemberNft {
       id: object::new(ctx),
-      name: name,
+      name,
+      nickname: nickname,
       description: description,
       sex: sex,
       avatar: avatar,
-      url: new_unsafe_from_bytes(b"https://aggregator.walrus-testnet.walrus.space/v1/iLHp_40XlzSXUfdVaT8hTRH__x_YAvggBzHeuB7hR1U"),
+      url: new_unsafe(avatar.to_ascii()),
       index: index,
     };
     transfer::transfer(nft, tx_context::sender(ctx));
@@ -89,6 +96,7 @@ module contract::member {
     let MemberNft {
       id,
       name: _,
+      nickname: _,
       description: _,
       sex: _,
       avatar: _,

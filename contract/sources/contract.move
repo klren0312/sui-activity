@@ -5,8 +5,8 @@ module contract::sui_hai {
   use std::string::{utf8, String};
   use sui::balance::{Self, zero, Balance};
   use sui::table::{Self, Table};
-  use sui::package::{claim_and_keep};
   use contract::member::{create_member_nft, get_member_struct, Member};
+  use sui::event;
 
   // 存的钱和数量不符
   const ErrorDepositNotEnough: u64 = 0;
@@ -14,11 +14,19 @@ module contract::sui_hai {
    // 当前会员已存在
   const ErrorAlreadyHasMember: u64 = 1;
 
-  public struct SUI_HAI has drop {}
-
  // 管理员权限
   public struct AdminCap has key {
     id: UID
+  }
+
+  // 创建会员事件
+  public struct CreateMemberEvent has copy, drop {
+    member: address,
+    nickname: String,
+    description: String,
+    sex: String,
+    avatar: String,
+    index: u64,
   }
 
   // 系统结构体
@@ -32,7 +40,7 @@ module contract::sui_hai {
   }
 
   // 初始化，创建系统
-  fun init (witness: SUI_HAI, ctx: &mut TxContext) {
+  fun init (ctx: &mut TxContext) {
     let suiHaiServer = SuiHaiServer {
       id: object::new(ctx),
       name: utf8(b"SUI-HAI-SERVER"),
@@ -41,7 +49,6 @@ module contract::sui_hai {
       members: table::new<address, Member>(ctx),
       activity_max_join_fee: 100_000_000_000
     };
-    claim_and_keep(witness, ctx);
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::share_object(suiHaiServer);
@@ -94,7 +101,7 @@ module contract::sui_hai {
     // 会员注册
   public entry fun add_memeber (
     sui_hai_server: &mut SuiHaiServer,
-    name: String,
+    nickname: String,
     description: String,
     sex: String,
     avatar: String,
@@ -107,7 +114,7 @@ module contract::sui_hai {
     let index = sui_hai_server.members.length();
     let current_index = index + 1;
     let member = get_member_struct(
-      name,
+      nickname,
       description,
       sex,
       avatar,
@@ -116,12 +123,22 @@ module contract::sui_hai {
     // 添加会员信息到总服务器
     sui_hai_server.members.add(ctx.sender(), member);
     create_member_nft(
-      name,
+      nickname,
       description,
       sex,
       avatar,
       current_index,
       ctx,
     );
+
+    // 会员注册事件
+    event::emit(CreateMemberEvent {
+      member: ctx.sender(),
+      nickname,
+      description,
+      sex,
+      avatar,
+      index: current_index,
+    })
   }
 }
