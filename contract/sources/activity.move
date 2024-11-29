@@ -24,10 +24,12 @@ module contract::activity {
   // 创建活动事件
   public struct CreateActivityEvent has copy, drop {
     creator: address,
+    activity_id: ID,
     title: String,
     description: String,
     date_range: vector<String>,
     location: String,
+    media: vector<String>, // 媒体文件 图片
     tag: String,
   }
 
@@ -49,7 +51,7 @@ module contract::activity {
   // 参与活动nft
   public struct JoinActivityNft has key {
     id: UID,
-    activity_addr: address,
+    activity_addr: ID,
     name: String,
     url: Url,
     activity_title: String,
@@ -84,18 +86,20 @@ module contract::activity {
       media,
       total_price: zero(),
     };
-    let admin_cap = AdminCap { id: object::new(ctx) };
-    transfer::transfer(admin_cap, tx_context::sender(ctx));
-    transfer::public_share_object(activity);
     // 创建活动事件
     event::emit(CreateActivityEvent {
+      activity_id: object::uid_to_inner(&activity.id),
       creator: ctx.sender(),
       title,
       description,
       date_range,
       location,
+      media,
       tag,
     });
+    let admin_cap = AdminCap { id: object::new(ctx) };
+    transfer::transfer(admin_cap, tx_context::sender(ctx));
+    transfer::share_object(activity);
   }
 
   // 更新活动信息
@@ -147,7 +151,7 @@ module contract::activity {
     // 创建参与活动nft
     let join_activity_nft = JoinActivityNft {
       id: object::new(ctx),
-      activity_addr: activity.id.to_address(),
+      activity_addr: object::uid_to_inner(&activity.id),
       name,
       url: new_unsafe(activity.media[0].to_ascii()),
       activity_title: activity.title,
@@ -167,7 +171,7 @@ module contract::activity {
     // 判断会员是否参与了当前活动
     assert!(activity.join_memeber.contains(&ctx.sender()), ErrorMemberNotJoinActivity);
     // 判断nft是否属于当前活动
-    assert!(join_activity_nft.activity_addr == activity.id.to_address(), ErrorNftNotMatchActivity);
+    assert!(join_activity_nft.activity_addr == object::uid_to_inner(&activity.id), ErrorNftNotMatchActivity);
 
     // 签到
     join_activity_nft.check_in = true;
