@@ -2,6 +2,7 @@ import { create } from 'zustand'
 export interface UserData {
   objectId: string,
   name: string,
+  nickname: string,
   description: string,
   sex: string,
   avatar: string,
@@ -15,6 +16,7 @@ export const useUserStore = create<UserState>()((set) => ({
   userData: {
     objectId: '',
     name: '',
+    nickname: '',
     description: '',
     sex: '',
     avatar: '',
@@ -23,6 +25,7 @@ export const useUserStore = create<UserState>()((set) => ({
     userData: {
       objectId: userData.objectId,
       name: userData.name,
+      nickname: userData.nickname,
       description: userData.description,
       sex: userData.sex,
       avatar: userData.avatar,

@@ -12,15 +12,16 @@ import CreateActivityBtn from '../CreateActivityBtn'
 import { useUserStore } from '../../stores/user'
 
 interface MemberData {
-  avatar: string;
-  description: string;
+  avatar: string
+  description: string
   id: {
-    id: string;
+    id: string
   }
-  index: string;
-  name: string;
-  sex: string;
-  url: string;
+  index: string
+  name: string
+  nickname: string
+  sex: string
+  url: string
 }
 
 const { Header, Content } = Layout
@@ -30,6 +31,7 @@ export default function PageLayout() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [userData, setUserData] = useState<MemberData>()
   const registerFormRef = useRef<{ submitForm: () => void; resetForm: () => void }>(null)
+  const needRefetch = useRef(false)
   const account = useCurrentAccount()
   const { setUser } = useUserStore()
   const { data: memberQueryData, isPending, refetch } = useSuiClientQuery(
@@ -62,6 +64,17 @@ export default function PageLayout() {
   const handleRegisterMember = () => {
     registerFormRef.current?.submitForm()
   }
+  const registerSuccess = async () => {
+    needRefetch.current = true
+    const result = await refetch()
+    if (result.data && result.data.data.length > 0 && result.data.data[0].data?.content?.dataType === 'moveObject') {
+      setUserData(result.data.data[0].data.content.fields as unknown as MemberData)
+    } else {
+      setUserData(undefined)
+      registerSuccess()
+    }
+    setIsRegisterModalOpen(false)
+  }
   useEffect(() => {
     let memeberData: MemberData | undefined = undefined
     if (memberQueryData && memberQueryData.data.length > 0 && memberQueryData.data[0].data?.content?.dataType === 'moveObject') {
@@ -69,11 +82,14 @@ export default function PageLayout() {
       setUser({
         objectId: memberQueryData.data[0].data.objectId,
         name: memeberData.name,
+        nickname: memeberData.nickname,
         description: memeberData.description,
         sex: memeberData.sex,
         avatar: memeberData.avatar,
       })
       setUserData(memeberData)
+    } else {
+      setUserData(undefined)
     }
   }, [memberQueryData])
   return (
@@ -93,7 +109,7 @@ export default function PageLayout() {
                 size="default"
                 icon={<img src={userData.avatar as string} />}
               />
-              <div className="flex items-center ml-2 mr-5">欢迎回家，<div className="font-bold text-green-500">{userData.name as string}</div></div>
+              <div className="flex items-center ml-2 mr-5">欢迎回家，<div className="font-bold text-green-500">{userData.nickname as string}</div></div>
             </div> :
             <Button className="mr-5" type="primary" onClick={openRegisterMember}>申请会员</Button>
           }
@@ -107,7 +123,7 @@ export default function PageLayout() {
           </React.StrictMode>
         </div>
       </Content>
-      <Modal title="申请会员" open={isRegisterModalOpen} onOk={handleRegisterMember} onCancel={() => {refetch();setIsRegisterModalOpen(false)}}>
+      <Modal title="申请会员" open={isRegisterModalOpen} onOk={handleRegisterMember} onCancel={registerSuccess}>
         <RegisterForm ref={registerFormRef} onSuccess={() => setIsRegisterModalOpen(false)}></RegisterForm>
       </Modal>
       <CreateActivityBtn />

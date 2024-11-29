@@ -31,6 +31,8 @@ module contract::activity {
     location: String,
     media: vector<String>, // 媒体文件 图片
     tag: String,
+    total_people_num: u64, // 人数
+    join_fee: u64, // 参与费用
   }
 
   // 活动结构
@@ -96,6 +98,8 @@ module contract::activity {
       location,
       media,
       tag,
+      total_people_num,
+      join_fee,
     });
     let admin_cap = AdminCap { id: object::new(ctx) };
     transfer::transfer(admin_cap, tx_context::sender(ctx));
