@@ -53,7 +53,7 @@ module contract::activity {
   // 参与活动nft
   public struct JoinActivityNft has key {
     id: UID,
-    activity_addr: ID,
+    activity_id: ID,
     name: String,
     url: Url,
     activity_title: String,
@@ -148,14 +148,14 @@ module contract::activity {
     // 费用存入池中
     activity.total_price.join(join_coin_balance);
     let index = activity.join_memeber.size() + 1;
-    let mut name = utf8(b"SUI-HAI-");
+    let mut name = utf8(b"SUI-HAI-ACTIVITY-");
     name.append(activity.title);
     name.append(b"#".to_string());
     name.append(index.to_string());
     // 创建参与活动nft
     let join_activity_nft = JoinActivityNft {
       id: object::new(ctx),
-      activity_addr: object::uid_to_inner(&activity.id),
+      activity_id: object::uid_to_inner(&activity.id),
       name,
       url: new_unsafe(activity.media[0].to_ascii()),
       activity_title: activity.title,
@@ -175,7 +175,7 @@ module contract::activity {
     // 判断会员是否参与了当前活动
     assert!(activity.join_memeber.contains(&ctx.sender()), ErrorMemberNotJoinActivity);
     // 判断nft是否属于当前活动
-    assert!(join_activity_nft.activity_addr == object::uid_to_inner(&activity.id), ErrorNftNotMatchActivity);
+    assert!(join_activity_nft.activity_id == object::uid_to_inner(&activity.id), ErrorNftNotMatchActivity);
 
     // 签到
     join_activity_nft.check_in = true;

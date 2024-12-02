@@ -49,18 +49,7 @@ export default function CreateActivityBtn() {
     const linkArr = res.filter(item => item)
     console.log(linkArr, values)
     const txb = new Transaction()
-    /**
-     * _: &MemberNft,
-      title: String, // 活动标题
-      description: String, // 描述
-      date_range: vector<String>, // 时间范围
-      location: String, // 地点
-      tag: String, // 分类
-      total_people_num: u64, // 人数
-      join_fee: u64,  // 参与费用
-      media: VecSet<String>, // 图片
-      ctx: &mut TxContext
-     */
+
     txb.moveCall({
       target: `${packageId}::activity::create_activity`,
       arguments: [
@@ -68,8 +57,8 @@ export default function CreateActivityBtn() {
         txb.pure.string(values.title),
         txb.pure.string(values.description),
         txb.pure.vector('string', [
-          dayjs(values.date_range[0]).format('YYYY-MM-DD HH:mm:ss'),
-          dayjs(values.date_range[1]).format('YYYY-MM-DD HH:mm:ss')
+          dayjs(values.date_range[0]).format('YYYY-MM-DD'),
+          dayjs(values.date_range[1]).format('YYYY-MM-DD')
         ]),
         txb.pure.string(values.location),
         txb.pure.string(values.tag),
@@ -126,11 +115,7 @@ export default function CreateActivityBtn() {
           <Form.Item name="date_range" label="时间范围" rules={[{ required: true, message: '请输入时间范围' }]}>
             <RangePicker
               disabledDate={disabledDate}
-              showTime={{
-                hideDisabledOptions: true,
-                defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('11:59:59', 'HH:mm:ss')],
-              }}
-              format="YYYY-MM-DD HH:mm:ss"
+              format="YYYY-MM-DD"
             />
           </Form.Item>
           <Form.Item name="location" label="活动地点" rules={[{ required: true, message: '请输入活动地点' }]}>

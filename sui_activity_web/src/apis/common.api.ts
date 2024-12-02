@@ -10,7 +10,8 @@ export async function UploadImageApi (file: File): Promise<UploadWalrusResponse 
   const binary = new Uint8Array(buffer)
   return request({
     method: 'PUT',
-    url: 'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100',
+    // url: 'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100',
+    url: 'http://127.0.0.1:31415/v1/store?epochs=100',
     data: binary,
     headers: {
       'Content-Type': mime.getType(file.name)

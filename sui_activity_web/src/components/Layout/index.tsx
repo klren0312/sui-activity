@@ -9,7 +9,7 @@ import RegisterForm from '../RegisterForm'
 import { useNetworkVariable } from '/@/utils/networkConfig'
 import { LoadingOutlined } from '@ant-design/icons'
 import CreateActivityBtn from '../CreateActivityBtn'
-import { useUserStore } from '../../stores/user'
+import { JoinActivityData, useUserStore } from '../../stores/user'
 
 interface MemberData {
   avatar: string
@@ -33,7 +33,8 @@ export default function PageLayout() {
   const registerFormRef = useRef<{ submitForm: () => void; resetForm: () => void }>(null)
   const needRefetch = useRef(false)
   const account = useCurrentAccount()
-  const { setUser } = useUserStore()
+  const { setUser, setJoinActivityList, setActivityListRefetch } = useUserStore()
+  // 查找会员卡
   const { data: memberQueryData, isPending, refetch } = useSuiClientQuery(
     'getOwnedObjects',
     {
@@ -58,15 +59,50 @@ export default function PageLayout() {
       gcTime: 10000,
     },
   )
+  // 查找参与的活动
+  const { data: joinQueryData, refetch: joinRefetch } = useSuiClientQuery(
+    'getOwnedObjects',
+    {
+      owner: account?.address || '',
+      filter: {
+        MatchAll: [
+          {
+            StructType: `${packageId}::activity::JoinActivityNft`,
+          },
+          {
+            AddressOwner: account?.address!!,
+          },
+        ],
+      },
+      options: {
+        showDisplay: true,
+        showContent: true,
+      },
+    },
+    {
+      gcTime: 10000,
+    },
+  )
+
+  /**
+   * 打开注册会员弹窗
+   */
   const openRegisterMember = () => {
     setIsRegisterModalOpen(true)
   }
+  /**
+   * 注册会员表单提交
+   */
   const handleRegisterMember = () => {
     registerFormRef.current?.submitForm()
   }
+  /**
+   * 注册会员成功
+   */
   const registerSuccess = async () => {
     needRefetch.current = true
     const result = await refetch()
+    console.log('refetch', result)
     if (result.data && result.data.data.length > 0 && result.data.data[0].data?.content?.dataType === 'moveObject') {
       setUserData(result.data.data[0].data.content.fields as unknown as MemberData)
     } else {
@@ -75,6 +111,15 @@ export default function PageLayout() {
     }
     setIsRegisterModalOpen(false)
   }
+  /**
+   * 初始化时设置活动列表刷新函数
+   */
+  useEffect(() => {
+    setActivityListRefetch(joinRefetch)
+  }, [])
+  /**
+   * 监听会员信息
+   */
   useEffect(() => {
     let memeberData: MemberData | undefined = undefined
     if (memberQueryData && memberQueryData.data.length > 0 && memberQueryData.data[0].data?.content?.dataType === 'moveObject') {
@@ -92,6 +137,24 @@ export default function PageLayout() {
       setUserData(undefined)
     }
   }, [memberQueryData])
+
+  /**
+   * 监听参与活动列表
+   */
+  useEffect(() => {
+    if (joinQueryData && joinQueryData.data.length > 0) {
+      console.log('joinQueryData', joinQueryData)
+      const arr = joinQueryData.data.map((item) => {
+        if (item?.data?.content?.dataType === 'moveObject') {
+          return item.data.content.fields as unknown as JoinActivityData
+        }
+        return undefined
+      }).filter((item) => item !== undefined) as JoinActivityData[]
+      setJoinActivityList(arr)
+    } else {
+      setJoinActivityList([])
+    }
+  }, [joinQueryData])
   return (
     <Layout>
       <Header className="page-header flex items-center justify-between px-5">
@@ -117,14 +180,14 @@ export default function PageLayout() {
         </div>
       </Header>
       <Content className="p-2 flex box-border">
-        <div className="h-full p-5 bg-white rounded-md box-border" style={{minHeight: 'calc(100vh - 83px)'}}>
+        <div className="h-full w-full p-5 bg-white rounded-md box-border" style={{minHeight: 'calc(100vh - 83px)'}}>
           <React.StrictMode>
             <RouterProvider router={router} future={{v7_startTransition: true}}/>
           </React.StrictMode>
         </div>
       </Content>
-      <Modal title="申请会员" open={isRegisterModalOpen} onOk={handleRegisterMember} onCancel={registerSuccess}>
-        <RegisterForm ref={registerFormRef} onSuccess={() => setIsRegisterModalOpen(false)}></RegisterForm>
+      <Modal title="申请会员" open={isRegisterModalOpen} onOk={handleRegisterMember} onCancel={() => setIsRegisterModalOpen(false)}>
+        <RegisterForm ref={registerFormRef} onSuccess={() => registerSuccess}></RegisterForm>
       </Modal>
       <CreateActivityBtn />
     </Layout>
