@@ -66,23 +66,6 @@ module contract::member {
     transfer::transfer(nft, tx_context::sender(ctx));
   }
 
-  // 修改会员信息
-  public fun change_info (
-    nft: &mut MemberNft,
-    name: String,
-    description: String,
-    sex: String,
-    avatar: String,
-    index: u64,
-    _: &mut TxContext
-  ) {
-    nft.name = name;
-    nft.description = description;
-    nft.sex = sex;
-    nft.avatar = avatar;
-    nft.index = index;
-  }
-
   // 删除会员
   public entry fun delete_memeber_nft (
     nft: MemberNft,

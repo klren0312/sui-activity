@@ -1,6 +1,6 @@
 export const TESTNET_PACKAGE_ID = '0x544f19419ede80e69bf24f297effefcf3549710ffeee4b3a07aae34fa42588ba'
-export const DEVNET_PACKAGE_ID = '0xda89de8b4abae44bc549e2a8672f17c4079598262c71f8068bdea5709beba9f6'
-export const SUI_HAI_SERVER = '0x9cde61c18ec6208eb47fa3f8df0252cafd1432ab7eda72df3c327a3add1ff32d'
+export const DEVNET_PACKAGE_ID = '0x317a3c381061eb5bb70d1af59156880bc6261757c35dad396677aa2aad0cab58'
+export const SUI_HAI_SERVER = '0x0f0673cbb67c7fff5a4379c15ffae5c9848ec387026cc19120dcd1467b3873e8'
 
 export const WALRUS_PUBLISHER = [
   'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100',
