@@ -2,11 +2,16 @@ import {
   createHashRouter,
 } from 'react-router-dom'
 import HomePage from '../pages/HomePage'
+import PersonCenter from '../pages/personCenter'
 
 const routes = [
   {
     path: '/',
     element: <HomePage />,
+  },
+  {
+    path: '/personCenter',
+    element: <PersonCenter />,
   }
 ]
 

@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNetworkVariable } from '../utils/networkConfig'
 import { useUserStore } from '../stores/user'
+import { SUI_DECIMALS } from '../utils/constants'
 const { Meta } = Card
 
 export interface ActivityData {
@@ -116,11 +117,23 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
               <Button disabled>已参加</Button> :
               activity.join_memeber.fields.contents.length >= parseInt(activity.total_people_num) ?
                 <Button color="danger" disabled>已满员</Button> :
-                <Button type="text" onClick={() => joinActivity(activity.id.id, activity.join_fee)}><UsergroupAddOutlined />
-                  立即参加
-                  <Tag icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
-                    {parseInt(activity.join_fee) === 0 ? '' : `${parseInt(activity.join_fee) / 1000000000}`}
-                  </Tag>
+                <Button type="text" onClick={
+                  (e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    joinActivity(activity.id.id, activity.join_fee)
+                  }
+                }>
+                  <UsergroupAddOutlined />
+                  {
+                    parseInt(activity.join_fee) === 0 ? '免费参加' : (
+                      <>
+                        立即参加
+                        <Tag icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
+                          {`${parseInt(activity.join_fee) / SUI_DECIMALS}`}
+                        </Tag>
+                      </>
+                    )
+                  }
                 </Button>
           ]}
         >
@@ -128,7 +141,13 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
             title={
               <div className="flex justify-between items-center">
                 <div className="overflow-hidden text-ellipsis whitespace-nowrap">{activity.title}</div>
-                <div className="text-xs text-gray-500">{activity.join_memeber.fields.contents.length} 人 / {activity.total_people_num} 人</div>
+                <div className="text-xs text-gray-500">
+                  {
+                    activity.join_memeber.fields.contents.length === parseInt(activity.total_people_num) ?
+                      '已无名额' :
+                      `${activity.join_memeber.fields.contents.length} 人 / ${activity.total_people_num} 人`
+                  }
+                </div>
               </div>
             }
             description={activity.description}
@@ -159,10 +178,11 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         </Carousel>
         <Descriptions bordered>
           <Descriptions.Item label="活动名称">{activityDetailData?.title}</Descriptions.Item>
+          <Descriptions.Item label="活动资金池">{parseInt(activityDetailData?.total_price ?? '0') / 1000000000} SUI</Descriptions.Item>
           <Descriptions.Item label="活动标签">{activityDetailData?.tag}</Descriptions.Item>
           <Descriptions.Item label="活动时间">{activityDetailData?.date_range.join(' - ')}</Descriptions.Item>
           <Descriptions.Item label="活动地点">{activityDetailData?.location}</Descriptions.Item>
-          <Descriptions.Item label="活动费用">{activityDetailData?.join_fee === '0' ? '免费' : `${parseInt(activityDetailData?.join_fee || '0') / 1000000000}`}</Descriptions.Item>
+          <Descriptions.Item label="活动费用">{activityDetailData?.join_fee === '0' ? '免费' : `${parseInt(activityDetailData?.join_fee || '0') / 1000000000} SUI`}</Descriptions.Item>
           <Descriptions.Item label="活动人数">总人数：{activityDetailData?.join_memeber.fields.contents.length} 人 / 上限：{activityDetailData?.total_people_num} 人</Descriptions.Item>
           <Descriptions.Item label="活动描述">{activityDetailData?.description}</Descriptions.Item>
         </Descriptions>

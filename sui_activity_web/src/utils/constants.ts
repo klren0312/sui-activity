@@ -32,3 +32,5 @@ export const WALRUS_AGGREGATOR = [
   'https://walrus-agg-testnet.chainode.tech:9002/v1/',
   'https://walrus-testnet-aggregator.starduststaking.com:11444/v1/',
 ]
+
+export const SUI_DECIMALS = 1000000000

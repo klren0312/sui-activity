@@ -1,6 +1,6 @@
 import { Layout } from 'antd'
 import router from '../../routers/router'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { ConnectButton, useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit'
 import '@mysten/dapp-kit/dist/index.css'
@@ -16,7 +16,8 @@ export default function PageLayout() {
   const packageId = useNetworkVariable('packageId')
   const account = useCurrentAccount()
   const { setJoinActivityList, setActivityListRefetch } = useUserStore()
- 
+  const [currentPath, setCurrentPath] = useState('/')
+
   // 查找参与的活动
   const { data: joinQueryData, refetch: joinRefetch } = useSuiClientQuery(
     'getOwnedObjects',
@@ -47,6 +48,7 @@ export default function PageLayout() {
    */
   useEffect(() => {
     setActivityListRefetch(joinRefetch)
+    setCurrentPath(window.location.hash.split('#')[1])
   }, [])
 
   /**
@@ -66,12 +68,29 @@ export default function PageLayout() {
       setJoinActivityList([])
     }
   }, [joinQueryData])
+
   return (
     <Layout>
       <Header className="page-header flex items-center justify-between px-5">
         <div className="flex items-center">
           <img className="w-10 h-10" src="/logo-transparent.svg" alt="logo" />
           <div className="page-title ml-5 text-white font-bold text-xl">SuiHi 随嗨</div>
+          <div
+            onClick={() => {setCurrentPath('/'); router.navigate('/')}}
+            className={`ml-10 text-white text-base cursor-pointer ${
+              currentPath === '/' ? 'font-bold' : ''
+            }`}
+          >
+            首页
+          </div>
+          <div
+            onClick={() => {setCurrentPath('/personCenter'); router.navigate('/personCenter')}}
+            className={`ml-5 text-white text-base cursor-pointer ${
+              currentPath === '/personCenter' ? 'font-bold' : ''
+            }`}
+          >
+            个人中心
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <MemberInfo />

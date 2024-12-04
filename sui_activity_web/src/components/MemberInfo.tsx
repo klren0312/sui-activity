@@ -51,7 +51,6 @@ const RegisterForm = forwardRef(() => {
         ],
       },
       options: {
-        showDisplay: true,
         showContent: true,
       },
     },
@@ -126,7 +125,7 @@ const RegisterForm = forwardRef(() => {
     }
   }
 
-    /**
+  /**
    * 监听会员信息
    */
   useEffect(() => {
@@ -140,12 +139,14 @@ const RegisterForm = forwardRef(() => {
         description: memeberData.description,
         sex: memeberData.sex,
         avatar: memeberData.avatar,
+        index: memeberData.index,
       })
       setUserData(memeberData)
     } else {
       setUserData(undefined)
     }
   }, [memberQueryData])
+
   return (
     <>
       {contextHolder}

@@ -6,6 +6,7 @@ export interface UserData {
   description: string,
   sex: string,
   avatar: string,
+  index: string,
 }
 export interface JoinActivityData {
   activity_id: string
@@ -38,6 +39,7 @@ export const useUserStore = create<UserState>()((set) => ({
     description: '',
     sex: '',
     avatar: '',
+    index: '',
   },
   joinActivityList: [],
   joinActivityIdList: [],
@@ -50,6 +52,7 @@ export const useUserStore = create<UserState>()((set) => ({
       description: userData.description,
       sex: userData.sex,
       avatar: userData.avatar,
+      index: userData.index,
     },
   }),
   setJoinActivityList: (joinActivityList: JoinActivityData[]) => {

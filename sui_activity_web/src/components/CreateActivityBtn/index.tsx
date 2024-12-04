@@ -4,7 +4,7 @@ import { RangePickerProps } from 'antd/es/date-picker'
 import dayjs from 'dayjs'
 import { useRef, useState } from 'react'
 import { UploadImageApi } from '/@/apis/common.api'
-import { WALRUS_AGGREGATOR } from '/@/utils/constants'
+import { SUI_DECIMALS, WALRUS_AGGREGATOR } from '/@/utils/constants'
 import { Transaction } from '@mysten/sui/transactions'
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
 import { useNetworkVariable } from '/@/utils/networkConfig'
@@ -16,7 +16,6 @@ const { RangePicker } = DatePicker
 export default function CreateActivityBtn() {
   const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false)
   const [form] = Form.useForm()
-  const [fee, setFee] = useState<number>(0)
   const [submitLoading, setSubmitLoading] = useState<boolean>(false)
   const createActivityFormRef = useRef<FormInstance>(null)
   const packageId = useNetworkVariable('packageId')
@@ -63,7 +62,7 @@ export default function CreateActivityBtn() {
         txb.pure.string(values.location),
         txb.pure.string(values.tag),
         txb.pure.u64(values.total_people_num),
-        txb.pure.u64(values.join_fee),
+        txb.pure.u64(values.join_fee * SUI_DECIMALS),
         txb.pure.vector('string', linkArr),
       ]
     })
@@ -78,12 +77,12 @@ export default function CreateActivityBtn() {
         },
         onSuccess: (result) => {
           form.resetFields()
+          setSubmitLoading(false)
           setIsCreateActivityModalOpen(false)
           messageApi.success(`活动创建成功: ${result.digest}`)
         },
       }
     )
-    setSubmitLoading(false)
   }
   const beforeUpload = (file: File) => {
     const isLessThan10M = file.size / 1024 / 1024 < 10;
@@ -91,11 +90,13 @@ export default function CreateActivityBtn() {
     
     if (!isLessThan10M) {
       messageApi.error('文件必须小于10MB!');
+      return Upload.LIST_IGNORE;
     }
     if (!isImage) {
       messageApi.error('只能上传 JPG/PNG/GIF/WEBP 格式的图片!');
+      return Upload.LIST_IGNORE;
     }
-    return false
+    return false;
   }
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -134,9 +135,11 @@ export default function CreateActivityBtn() {
             <div>
               <InputNumber<number>
                 className="w-full"
-                onChange={(value) => setFee(value || 0)}
+                min={0}
+                stringMode
+                precision={9}
+                addonAfter="SUI"
               />
-              { fee / 1000000000 } SUI
             </div>
           </Form.Item>
           <Form.Item name="media" label="活动图片" rules={[{ required: true, message: '请输入活动图片' }]} getValueFromEvent={normFile} valuePropName="fileList">
@@ -155,7 +158,7 @@ export default function CreateActivityBtn() {
               </p>
             </Dragger>
           </Form.Item>
-          <Form.Item name="description" label="活动描述" rules={[{ required: true, message: '请输入活动描述' }]}>
+          <Form.Item name="description" label="活动描述" rules={[{ required: true, message: '请输��活动描述' }]}>
             <Input.TextArea rows={4} />
           </Form.Item>
         </Form>
