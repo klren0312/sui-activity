@@ -25,6 +25,31 @@ interface ServerData {
   pool_balance: string
 }
 
+export interface ActivityEventData {
+  id: {
+    txDigest: string
+    eventSeq: string
+  }
+  packageId: string
+  transactionModule: string
+  sender: string
+  type: string
+  parsedJson: {
+    activity_id: string
+    creator: string
+    date_range: string[]
+    description: string
+    join_fee: string
+    location: string
+    media: string[]
+    tag: string
+    title: string
+    total_people_num: string
+  }
+  bcs: string
+  timestampMs: string
+}
+
 function HomePage () {
   const packageId = useNetworkVariable('packageId')
   const client = useSuiClient()
@@ -75,7 +100,7 @@ function HomePage () {
     "multiGetObjects",
     {
       ids:
-        activityEvents?.data.map((item) => (item.parsedJson as any).activity_id as string) || [],
+        (activityEvents?.data as unknown as ActivityEventData[]).map((item) => item.parsedJson.activity_id) || [],
       options: {
         showContent: true,
       },
@@ -96,7 +121,6 @@ function HomePage () {
         }
         return undefined
       }).filter(item => item) as unknown as ActivityData[]
-      console.log('formatArr', formatArr)
       setActivityData(formatArr)
 
     }
