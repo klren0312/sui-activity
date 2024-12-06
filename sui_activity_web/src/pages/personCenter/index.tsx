@@ -1,4 +1,4 @@
-import { Avatar, Card, Divider, Table } from "antd"
+import { Avatar, Button, Card, Divider, Table } from "antd"
 import { useUserStore } from "/@/stores/user"
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
 import { useNetworkVariable } from "/@/utils/networkConfig"
@@ -76,6 +76,14 @@ export default function PersonCenter() {
       refetchInterval: 10000,
     }
   )
+
+  /**
+   * 提取活动经费
+   * @param activityId 活动ID
+   */
+  const getActivityFunds = (activityId: string) => {
+    console.log(activityId)
+  }
 
   // 设置参与活动
   useEffect(() => {
@@ -198,6 +206,13 @@ export default function PersonCenter() {
                 title: '活动类型',
                 dataIndex: 'tag',
                 key: 'tag',
+              },
+              {
+                title: '操作',
+                key: 'action',
+                render: (_, record) => (
+                  <Button type="link" onClick={() => getActivityFunds(record.id.id)}>提取活动经费</Button>
+                ),
               },
             ]}
           />

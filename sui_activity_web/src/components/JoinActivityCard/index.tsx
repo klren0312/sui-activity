@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import ActivityDetailModal from '../ActivityDetailModal'
+import { Button, message } from 'antd'
+import { useNetworkVariable } from '/@/utils/networkConfig'
+import { Transaction } from '@mysten/sui/transactions'
+import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
 
 export interface JoinActivityData {
   activity_id: string
@@ -15,21 +19,52 @@ export interface JoinActivityData {
 }
 
 interface Props {
-  joinData: JoinActivityData
+  joinData: JoinActivityData // 参与活动数据
 }
 
 export default function JoinActivityCard({ joinData }: Props) {
   const [activityDetailModalOpen, setActivityDetailModalOpen] = useState(false)
-
+  const packageId = useNetworkVariable('packageId')
+  const { mutate } = useSignAndExecuteTransaction()
+  const [messageApi, contextHolder] = message.useMessage()
   const handleActivityDetailModalOpen = () => {
     setActivityDetailModalOpen(true)
   }
 
+  /**
+   * 活动签到
+   */
+  const handleCheckIn = () => {
+    const txb = new Transaction()
+    txb.moveCall({
+      target: `${packageId}::activity::check_in`,
+      arguments: [
+        txb.object(joinData.id.id),
+        txb.object(joinData.activity_id)
+      ]
+    })
+    mutate(
+      {
+        transaction: txb,
+      },
+      {
+        onSuccess: () => {
+          Object.assign(joinData, { check_in: true })
+          messageApi.success('签到成功')
+        },
+        onError: (err) => {
+          messageApi.error(err.message)
+        }
+      }
+    )
+  }
+
   return (
     <>
+      {contextHolder}
       <div key={joinData.id.id} onClick={handleActivityDetailModalOpen} className="join-activity-card relative rounded-md shadow-lg shadow-black cursor-pointer">
-        <div className="absolute top-4 left-4 text-white text-base">
-          #{joinData.index}
+        <div className="absolute top-1 right-1 text-white text-sm">
+          #{joinData.index}-{joinData.check_in ? '已签到' : '未签到'}
         </div>
         <div className="w-full absolute bottom-4 left-4">
           <div className="text-lg font-bold text-white overflow-hidden whitespace-nowrap text-ellipsis" title={joinData.activity_title}>{joinData.activity_title}</div>
@@ -42,6 +77,11 @@ export default function JoinActivityCard({ joinData }: Props) {
           activityDetailModalOpen={activityDetailModalOpen}
           setActivityDetailModalOpen={setActivityDetailModalOpen}
           activityId={joinData.activity_id}
+          customFooter={
+            joinData.check_in ? null : <div className="flex justify-center">
+              <Button type="primary" onClick={handleCheckIn}>活动签到</Button>
+            </div>
+          }
         />
       }
     </>

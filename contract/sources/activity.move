@@ -35,6 +35,18 @@ module contract::activity {
     join_fee: u64, // 参与费用
   }
 
+  // 签到事件
+  public struct CheckInEvent has copy, drop {
+    activity_id: ID,
+    join_activity_nft_id: ID,
+  }
+
+  // 评分事件
+  public struct ScoreEvent has copy, drop {
+    activity_id: ID,
+    score: u8,
+  }
+
   // 活动结构
   public struct Activity has key, store {
     id: UID,
@@ -48,6 +60,15 @@ module contract::activity {
     join_memeber: VecSet<address>, // 参加的成员列表
     media: vector<String>, // 媒体文件 图片
     total_price: Balance<SUI>, // 总活动资金
+    comments: vector<u8>, // 评分集合
+  }
+
+  // 活动创建nft
+  public struct CreateActivityNft has key {
+    id: UID,
+    activity_id: ID,
+    title: String,
+    admin_cap: ID,
   }
 
   // 参与活动nft
@@ -87,6 +108,7 @@ module contract::activity {
       join_memeber: empty(),
       media,
       total_price: zero(),
+      comments: vector::empty(),
     };
     // 创建活动事件
     event::emit(CreateActivityEvent {
@@ -102,6 +124,13 @@ module contract::activity {
       join_fee,
     });
     let admin_cap = AdminCap { id: object::new(ctx) };
+    let create_activity_nft = CreateActivityNft {
+      id: object::new(ctx),
+      activity_id: object::uid_to_inner(&activity.id),
+      title,
+      admin_cap: object::uid_to_inner(&admin_cap.id),
+    };
+    transfer::transfer(create_activity_nft, tx_context::sender(ctx));
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::share_object(activity);
   }
@@ -179,5 +208,30 @@ module contract::activity {
 
     // 签到
     join_activity_nft.check_in = true;
+
+    // 签到事件
+    event::emit(CheckInEvent {
+      activity_id: object::uid_to_inner(&activity.id),
+      join_activity_nft_id: object::uid_to_inner(&join_activity_nft.id),
+    });
+  }
+
+  // 评分
+  public fun score (
+    _: &JoinActivityNft,
+    activity: &mut Activity,
+    score: u8,
+    ctx: &mut TxContext,
+  ) {
+    // 判断是否参加了当前活动
+    assert!(activity.join_memeber.contains(&ctx.sender()), ErrorMemberNotJoinActivity);
+    // 添加评分
+    activity.comments.push_back(score);
+
+    // 评分事件
+    event::emit(ScoreEvent {
+      activity_id: object::uid_to_inner(&activity.id),
+      score,
+    });
   }
 }
