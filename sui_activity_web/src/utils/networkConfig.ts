@@ -2,11 +2,22 @@ import { getFullnodeUrl } from '@mysten/sui/client'
 import {
 	TESTNET_PACKAGE_ID,
 	DEVNET_PACKAGE_ID,
+	MAINNET_PACKAGE_ID,
+	MAINNET_HAI_SERVER,
+	SUI_HAI_SERVER_DEVNET,
+	SUI_HAI_SERVER_TESTNET,
 } from './constants'
 import { createNetworkConfig } from '@mysten/dapp-kit'
 
 const { networkConfig, useNetworkVariable, useNetworkVariables } =
 	createNetworkConfig({
+		mainnet: {
+			url: getFullnodeUrl('mainnet'),
+			variables: {
+				packageId: MAINNET_PACKAGE_ID,
+				server: MAINNET_HAI_SERVER,
+			},
+		},
 		/**
 		  sui-api.rpcpool.com
 			sui-rpc.testnet.lgns.net
@@ -26,12 +37,14 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
 			url: getFullnodeUrl('testnet'),
 			variables: {
 				packageId: TESTNET_PACKAGE_ID,
+				server: SUI_HAI_SERVER_TESTNET,
 			},
 		},
 		devnet: {
 			url: getFullnodeUrl('devnet'),
 			variables: {
 				packageId: DEVNET_PACKAGE_ID,
+				server: SUI_HAI_SERVER_DEVNET,
 			},
 		},
 	})

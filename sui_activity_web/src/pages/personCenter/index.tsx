@@ -1,14 +1,15 @@
-import { Avatar, Button, Card, Divider, Table } from "antd"
-import { useUserStore } from "/@/stores/user"
-import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
-import { useNetworkVariable } from "/@/utils/networkConfig"
-import { useEffect, useState } from "react"
-import JoinActivityCard, { JoinActivityData } from "/@/components/JoinActivityCard"
+import { Avatar, Button, Card, Divider, Table } from 'antd'
+import { useUserStore } from '/@/stores/user'
+import { useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit'
+import { useNetworkVariable } from '/@/utils/networkConfig'
+import { useEffect, useState } from 'react'
+import JoinActivityCard, { JoinActivityData } from '/@/components/JoinActivityCard'
 import './index.less'
-import { ActivityEventData } from "../HomePage"
-import { ActivityData } from "/@/components/ActivityCard"
-import dayjs from "dayjs"
-import { SUI_DECIMALS } from "/@/utils/constants"
+import { ActivityEventData } from '../HomePage'
+import { ActivityData } from '/@/components/ActivityCard'
+import dayjs from 'dayjs'
+import { SUI_DECIMALS } from '/@/utils/constants'
+import QrcodeModal from '/@/components/QrcodeModal'
 const { Meta } = Card
 
 export default function PersonCenter() {
@@ -17,6 +18,8 @@ export default function PersonCenter() {
   const packageId = useNetworkVariable('packageId')
   const [joinActivity, setJoinActivity] = useState<JoinActivityData[]>([])
   const [createActivity, setCreateActivity] = useState<ActivityData[]>([])
+  const [qrcodeModalOpen, setQrcodeModalOpen] = useState(false)
+  const [qrcodeActivityId, setQrcodeActivityId] = useState('')
 
   // 查找参加的活动
   const { data: joinData } = useSuiClientQuery(
@@ -83,6 +86,15 @@ export default function PersonCenter() {
    */
   const getActivityFunds = (activityId: string) => {
     console.log(activityId)
+  }
+
+  /**
+   * 获取活动签到二维码
+   * @param activityId 活动ID
+   */
+  const getActivityCheckInQRCode = (activityId: string) => {
+    setQrcodeActivityId(activityId)
+    setQrcodeModalOpen(true)
   }
 
   // 设置参与活动
@@ -152,6 +164,7 @@ export default function PersonCenter() {
           <Divider />
           {/* 发布的活动卡片 */}
           <Table
+            rowKey={(record) => record.id.id}
             dataSource={createActivity}
             pagination={false}
             columns={[
@@ -211,11 +224,15 @@ export default function PersonCenter() {
                 title: '操作',
                 key: 'action',
                 render: (_, record) => (
-                  <Button type="link" onClick={() => getActivityFunds(record.id.id)}>提取活动经费</Button>
+                  <div className="flex">
+                    <Button type="link" onClick={() => getActivityFunds(record.id.id)}>提取活动经费</Button>
+                    <Button type="link" onClick={() => getActivityCheckInQRCode(record.id.id)}>签到二维码</Button>
+                  </div>
                 ),
               },
             ]}
           />
+          <QrcodeModal open={qrcodeModalOpen} activityId={qrcodeActivityId} onCancel={() => setQrcodeModalOpen(false)} />
         </div>
       </div>
     </div>
