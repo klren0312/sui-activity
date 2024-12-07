@@ -30,6 +30,7 @@ export interface ActivityData {
   title: string
   total_people_num: string
   total_price: string
+  score: number
 }
 
 interface ActivityCardProps {

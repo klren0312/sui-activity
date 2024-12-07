@@ -6,7 +6,7 @@ import { UploadImageApi } from '../apis/common.api'
 import { forwardRef, useEffect, useState } from 'react'
 import { Transaction } from '@mysten/sui/transactions'
 import { useNetworkVariable } from '../utils/networkConfig'
-import { SUI_HAI_SERVER, WALRUS_AGGREGATOR } from '../utils/constants'
+import { WALRUS_AGGREGATOR } from '../utils/constants'
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from '@mysten/dapp-kit'
 import { message } from 'antd'
 import { useUserStore } from '../stores/user'
@@ -28,6 +28,7 @@ const RegisterForm = forwardRef(() => {
   const [messageApi, contextHolder] = message.useMessage()
   const [form] = Form.useForm()
   const packageId = useNetworkVariable('packageId')
+  const server = useNetworkVariable('server')
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [userData, setUserData] = useState<MemberData>()
   const account = useCurrentAccount()
@@ -85,7 +86,7 @@ const RegisterForm = forwardRef(() => {
     txb.moveCall({
       target: `${packageId}::sui_hai::add_memeber`,
       arguments: [
-        txb.object(SUI_HAI_SERVER),
+        txb.object(server),
         txb.pure.string(values.name),
         txb.pure.string(values.description),
         txb.pure.string(values.sex),
