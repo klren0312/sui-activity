@@ -1,12 +1,14 @@
 module contract::activity {
   use std::string::{String, utf8};
   use sui::vec_set::{empty, VecSet};
-  use sui::balance::{zero, Balance};
+  use sui::balance::{Self,zero, Balance};
   use sui::sui::SUI;
   use sui::event;
-  use sui::coin::{Coin, into_balance, value};
+  use sui::coin::{Coin, into_balance, value, from_balance};
   use contract::member::{MemberNft};
   use sui::url::{Url, new_unsafe};
+  use contract::sui_hai::{get_activity_fee, join_activity_fee, SuiHaiServer};
+  use sui::table::{Self, Table};
 
   // 参加活动费用不足
   const ErrorJoinFeeNotEnough: u64 = 0;
@@ -16,6 +18,10 @@ module contract::activity {
   const ErrorMemberNotJoinActivity: u64 = 2;
   // 当前nft不匹配当前活动
   const ErrorNftNotMatchActivity: u64 = 3;
+  // 已经评分
+  const ErrorAlreadyScore: u64 = 4;
+  // 评分无效
+  const ErrorScoreInvalid: u64 = 5;
 
   public struct AdminCap has key {
     id: UID
@@ -60,7 +66,8 @@ module contract::activity {
     join_memeber: VecSet<address>, // 参加的成员列表
     media: vector<String>, // 媒体文件 图片
     total_price: Balance<SUI>, // 总活动资金
-    comments: vector<u8>, // 评分集合
+    score: u8, // 评分
+    comments: Table<address,u8>, // 评分集合
   }
 
   // 活动创建nft
@@ -108,7 +115,8 @@ module contract::activity {
       join_memeber: empty(),
       media,
       total_price: zero(),
-      comments: vector::empty(),
+      score: 0,
+      comments: table::new(ctx),
     };
     // 创建活动事件
     event::emit(CreateActivityEvent {
@@ -225,13 +233,43 @@ module contract::activity {
   ) {
     // 判断是否参加了当前活动
     assert!(activity.join_memeber.contains(&ctx.sender()), ErrorMemberNotJoinActivity);
-    // 添加评分
-    activity.comments.push_back(score);
+    // 判断是否已经评分
+    assert!(!activity.comments.contains(ctx.sender()), ErrorAlreadyScore);
+    // 判断评分是否大于5
+    assert!(score <= 5, ErrorScoreInvalid);
 
+    // 添加评分
+    activity.comments.add(ctx.sender(), score);
+    // 计算评分
+    activity.score = activity.score + score;
     // 评分事件
     event::emit(ScoreEvent {
       activity_id: object::uid_to_inner(&activity.id),
       score,
     });
+  }
+
+  // 活动方提现
+  #[allow(lint(self_transfer))]
+  public fun withdraw (
+    _: &AdminCap,
+    sui_hai_server: &mut SuiHaiServer,
+    activity: &mut Activity,
+    ctx: &mut TxContext,
+  ) {
+    // 分割活动钱
+    let activity_price_value = balance::value(&activity.total_price);
+    let activity_fee = get_activity_fee(sui_hai_server);
+    let activity_fee_value = activity_price_value / activity_fee;
+    // 分割手续费余额
+    let activity_fee_balance = balance::split(&mut activity.total_price, activity_fee_value);
+    // 手续费充入服务器池子
+    join_activity_fee(sui_hai_server, activity_fee_balance);
+
+    // 提现余额
+    let withdraw_value = activity_price_value - activity_fee_value;
+    let withdraw_balance = balance::split(&mut activity.total_price, withdraw_value);
+    let withdraw_coin = from_balance(withdraw_balance, ctx);
+    transfer::public_transfer(withdraw_coin, tx_context::sender(ctx));
   }
 }

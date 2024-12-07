@@ -55,12 +55,27 @@ module contract::sui_hai {
   }
 
   // 管理员修改活动基础手续费
-  public fun change_fee (
+  public fun change_activity_fee (
     _: &AdminCap,
     sui_hai_server: &mut SuiHaiServer,
     fee: u64
   ) {
     sui_hai_server.activity_fee = fee;
+  }
+
+  // 获取活动基础手续费
+  public(package) fun get_activity_fee (
+    sui_hai_server: &SuiHaiServer,
+  ): u64 {
+    sui_hai_server.activity_fee
+  }
+
+  // 手续费充入池子
+  public(package) fun join_activity_fee (
+    sui_hai_server: &mut SuiHaiServer,
+    activity_fee_balance: Balance<SUI>,
+  ) {
+    sui_hai_server.pool_balance.join(activity_fee_balance);
   }
 
   // 服务器存钱
