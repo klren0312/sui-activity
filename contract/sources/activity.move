@@ -5,7 +5,7 @@ module contract::activity {
   use sui::sui::SUI;
   use sui::event;
   use sui::coin::{Coin, into_balance, value, from_balance};
-  use contract::member::{MemberNft};
+  use contract::member::{MemberNft, add_point};
   use sui::url::{Url, new_unsafe};
   use contract::sui_hai::{get_activity_fee, join_activity_fee, SuiHaiServer};
   use sui::table::{Self, Table};
@@ -92,7 +92,7 @@ module contract::activity {
 
   // 创建活动
   public fun create_activity (
-    _: &MemberNft,
+    member: &mut MemberNft,
     title: String, // 活动标题
     description: String, // 描述
     date_range: vector<String>, // 时间范围
@@ -138,6 +138,8 @@ module contract::activity {
       title,
       admin_cap: object::uid_to_inner(&admin_cap.id),
     };
+    // 添加积分
+    add_point(member, 1);
     transfer::transfer(create_activity_nft, tx_context::sender(ctx));
     transfer::transfer(admin_cap, tx_context::sender(ctx));
     transfer::share_object(activity);
@@ -168,7 +170,7 @@ module contract::activity {
 
   // 参加活动
   public fun join_activity (
-    _: &MemberNft,
+    member: &mut MemberNft,
     activity: &mut Activity,
     join_coin: Coin<SUI>,
     join_time: String,
@@ -200,11 +202,14 @@ module contract::activity {
       check_in: false,
       index,
     };
+    // 增加积分
+    add_point(member, 1);
     transfer::transfer(join_activity_nft, ctx.sender());
   }
 
   // 签到
   public fun check_in (
+    member: &mut MemberNft,
     join_activity_nft: &mut JoinActivityNft,
     activity: &mut Activity,
     ctx: &mut TxContext,
@@ -216,7 +221,8 @@ module contract::activity {
 
     // 签到
     join_activity_nft.check_in = true;
-
+    // 增加积分
+    add_point(member, 1);
     // 签到事件
     event::emit(CheckInEvent {
       activity_id: object::uid_to_inner(&activity.id),
@@ -227,6 +233,7 @@ module contract::activity {
   // 评分
   public fun score (
     _: &JoinActivityNft,
+    member: &mut MemberNft,
     activity: &mut Activity,
     score: u8,
     ctx: &mut TxContext,
@@ -242,6 +249,9 @@ module contract::activity {
     activity.comments.add(ctx.sender(), score);
     // 计算评分
     activity.score = activity.score + score;
+    // 增加积分
+    add_point(member, 1);
+
     // 评分事件
     event::emit(ScoreEvent {
       activity_id: object::uid_to_inner(&activity.id),

@@ -14,6 +14,7 @@ module contract::member {
   // 会员nft结构体
   public struct MemberNft has key {
     id: UID,
+    point: u8, // 积分
     name: String,
     nickname: String,
     description: String,
@@ -55,6 +56,7 @@ module contract::member {
 
     let nft = MemberNft {
       id: object::new(ctx),
+      point: 0,
       name,
       nickname: nickname,
       description: description,
@@ -73,6 +75,7 @@ module contract::member {
   ) {
     let MemberNft {
       id,
+      point: _,
       name: _,
       nickname: _,
       description: _,
@@ -82,5 +85,13 @@ module contract::member {
       index: _,
     } = nft;
     object::delete(id);
+  }
+
+  // 增加积分
+  public(package) fun add_point (
+    member: &mut MemberNft,
+    point: u8,
+  ) {
+    member.point = member.point + point;
   }
 }
