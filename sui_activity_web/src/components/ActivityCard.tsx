@@ -141,7 +141,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                     parseInt(activity.join_fee) === 0 ? '免费参加' : (
                       <>
                         立即参加
-                        <Tag icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
+                        <Tag className="flex items-center" icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
                           {`${parseInt(activity.join_fee) / SUI_DECIMALS}`}
                         </Tag>
                       </>
@@ -181,8 +181,8 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                   <Button color="danger" disabled>已满员</Button> :
                   <Button type="text" onClick={() => joinActivity(activityDetailData?.id.id, activityDetailData?.join_fee)}><UsergroupAddOutlined />
                     立即参加
-                    <Tag icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
-                      {activityDetailData?.join_fee === '0' ? '' : `${parseInt(activityDetailData?.join_fee) / 1000000000}`}
+                    <Tag className="flex items-center" icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
+                      {activityDetailData?.join_fee === '0' ? '' : `${parseInt(activityDetailData?.join_fee) / SUI_DECIMALS}`}
                     </Tag>
                   </Button>}
             </div>

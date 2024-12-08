@@ -10,6 +10,7 @@ import { WALRUS_AGGREGATOR } from '../utils/constants'
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from '@mysten/dapp-kit'
 import { message } from 'antd'
 import { useUserStore } from '../stores/user'
+import { UpdatePointApi } from '../apis/point.api'
 
 interface MemberData {
   avatar: string
@@ -22,6 +23,7 @@ interface MemberData {
   nickname: string
   sex: string
   url: string
+  point: number
 }
 
 const RegisterForm = forwardRef(() => {
@@ -33,7 +35,7 @@ const RegisterForm = forwardRef(() => {
   const [userData, setUserData] = useState<MemberData>()
   const account = useCurrentAccount()
   const { mutate } = useSignAndExecuteTransaction()
-  const { setUser } = useUserStore()
+  const { setUser, resetUser } = useUserStore()
 
   // 查找会员卡
   const { data: memberQueryData, isPending, refetch: refetchMemberInfo } = useSuiClientQuery(
@@ -59,7 +61,7 @@ const RegisterForm = forwardRef(() => {
       gcTime: 10000,
     },
   )
-  
+
   /**
    * 自定义上传逻辑
    */
@@ -116,7 +118,6 @@ const RegisterForm = forwardRef(() => {
    */
   const registerSuccessHandler = async () => {
     setIsRegisterModalOpen(false)
-    console.log('refetchMemberInfo')
     const result = await refetchMemberInfo()
     console.log('refetch', result)
     if (result.data && result.data.data.length > 0 && result.data.data[0].data?.content?.dataType === 'moveObject') {
@@ -130,21 +131,31 @@ const RegisterForm = forwardRef(() => {
    * 监听会员信息
    */
   useEffect(() => {
-    let memeberData: MemberData | undefined = undefined
-    if (memberQueryData && memberQueryData.data.length > 0 && memberQueryData.data[0].data?.content?.dataType === 'moveObject') {
-      memeberData = memberQueryData.data[0].data.content.fields as unknown as MemberData
-      setUser({
+    if (!memberQueryData) {
+      setUserData(undefined)
+      resetUser()
+      return
+    }
+    let memberData: MemberData | undefined = undefined
+    if (memberQueryData.data.length > 0 && memberQueryData.data[0].data?.content?.dataType === 'moveObject') {
+      memberData = memberQueryData.data[0].data.content.fields as unknown as MemberData
+      const obj = {
         objectId: memberQueryData.data[0].data.objectId,
-        name: memeberData.name,
-        nickname: memeberData.nickname,
-        description: memeberData.description,
-        sex: memeberData.sex,
-        avatar: memeberData.avatar,
-        index: memeberData.index,
-      })
-      setUserData(memeberData)
+        point: memberData.point,
+        name: memberData.name,
+        nickname: memberData.nickname,
+        description: memberData.description,
+        sex: memberData.sex,
+        avatar: memberData.avatar,
+        index: memberData.index,
+      }
+      setUser(obj, account?.address || '')
+      console.log('update point')
+      UpdatePointApi(account?.address || '', obj)
+      setUserData(memberData)
     } else {
       setUserData(undefined)
+      resetUser()
     }
   }, [memberQueryData])
 

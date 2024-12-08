@@ -30,59 +30,65 @@ export default function CreateActivityBtn() {
     setSubmitLoading(true)
     console.log(values)
     const mediaArr = values.media
-    const res = await Promise.all(mediaArr.map(async (file: any) => {
-      const res = await UploadImageApi(file.originFileObj)
-      if (res) {
-        let blobId = ''
-        if (res.alreadyCertified) {
-          blobId = res.alreadyCertified.blobId
-        } else if (res.newlyCreated) {
-          blobId = res.newlyCreated.blobObject.blobId
+    // 上传图片
+    try {
+      const resultArr = await Promise.all(mediaArr.map(async (file: any) => {
+        const res = await UploadImageApi(file.originFileObj)
+        if (res) {
+          let blobId = ''
+          if (res.alreadyCertified) {
+            blobId = res.alreadyCertified.blobId
+          } else if (res.newlyCreated) {
+            blobId = res.newlyCreated.blobObject.blobId
+          }
+          return `${WALRUS_AGGREGATOR[0]}${blobId}`
+        } else {
+          message.error('上传失败')
         }
-        return `${WALRUS_AGGREGATOR[0]}${blobId}`
-      } else {
-        message.error('上传失败')
-      }
-      return ''
-    }))
-    const linkArr = res.filter(item => item)
-    console.log(linkArr, values)
-    const txb = new Transaction()
+        return ''
+      }))
+      const linkArr = resultArr.filter(item => item)
+      console.log(linkArr, values)
+      const txb = new Transaction()
 
-    txb.moveCall({
-      target: `${packageId}::activity::create_activity`,
-      arguments: [
-        txb.object(userData.objectId),
-        txb.pure.string(values.title),
-        txb.pure.string(values.description),
-        txb.pure.vector('string', [
-          dayjs(values.date_range[0]).format('YYYY-MM-DD'),
-          dayjs(values.date_range[1]).format('YYYY-MM-DD')
-        ]),
-        txb.pure.string(values.location),
-        txb.pure.string(values.tag),
-        txb.pure.u64(values.total_people_num),
-        txb.pure.u64(values.join_fee * SUI_DECIMALS),
-        txb.pure.vector('string', linkArr),
-      ]
-    })
-    mutate(
-      {
-        transaction: txb
-      },
-      {
-        onError: (err) => {
-          console.log(err.message)
-          messageApi.error(err.message)
+      txb.moveCall({
+        target: `${packageId}::activity::create_activity`,
+        arguments: [
+          txb.object(userData.objectId),
+          txb.pure.string(values.title),
+          txb.pure.string(values.description),
+          txb.pure.vector('string', [
+            dayjs(values.date_range[0]).format('YYYY-MM-DD'),
+            dayjs(values.date_range[1]).format('YYYY-MM-DD')
+          ]),
+          txb.pure.string(values.location),
+          txb.pure.string(values.tag),
+          txb.pure.u64(values.total_people_num),
+          txb.pure.u64(values.join_fee * SUI_DECIMALS),
+          txb.pure.vector('string', linkArr),
+        ]
+      })
+      mutate(
+        {
+          transaction: txb
         },
-        onSuccess: (result) => {
-          form.resetFields()
-          setSubmitLoading(false)
-          setIsCreateActivityModalOpen(false)
-          messageApi.success(`活动创建成功: ${result.digest}`)
-        },
-      }
-    )
+        {
+          onError: (err) => {
+            console.log(err.message)
+            messageApi.error(err.message)
+          },
+          onSuccess: (result) => {
+            form.resetFields()
+            setSubmitLoading(false)
+            setIsCreateActivityModalOpen(false)
+            messageApi.success(`活动创建成功: ${result.digest}`)
+          },
+        }
+      )
+    } catch (error) {
+      console.error(error)
+      messageApi.error('上传图片失败，请重新创建')
+    }
   }
   const beforeUpload = (file: File) => {
     const isLessThan10M = file.size / 1024 / 1024 < 10;
