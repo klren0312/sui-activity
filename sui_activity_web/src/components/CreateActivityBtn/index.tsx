@@ -9,6 +9,7 @@ import { Transaction } from '@mysten/sui/transactions'
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
 import { useNetworkVariable } from '/@/utils/networkConfig'
 import { useUserStore } from '/@/stores/user'
+import Markdown from 'react-markdown'
 
 const { Dragger } = Upload
 const { RangePicker } = DatePicker
@@ -159,7 +160,8 @@ export default function CreateActivityBtn() {
             </Dragger>
           </Form.Item>
           <Form.Item name="description" label="活动描述" rules={[{ required: true, message: '请输��活动描述' }]}>
-            <Input.TextArea rows={4} />
+            {/* <Input.TextArea rows={4} /> */}
+            <Markdown></Markdown>
           </Form.Item>
         </Form>
       </Modal>
