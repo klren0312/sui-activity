@@ -9,7 +9,7 @@ import { Transaction } from '@mysten/sui/transactions'
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
 import { useNetworkVariable } from '/@/utils/networkConfig'
 import { useUserStore } from '/@/stores/user'
-import Markdown from 'react-markdown'
+import MDEditor from '@uiw/react-md-editor'
 
 const { Dragger } = Upload
 const { RangePicker } = DatePicker
@@ -23,6 +23,7 @@ export default function CreateActivityBtn() {
   const { mutate } = useSignAndExecuteTransaction()
   const { userData } = useUserStore()
   const [messageApi, contextHolder] = message.useMessage()
+  const [descriptionText, setDescriptionText] = useState('')
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
     return current && current < dayjs().endOf('day');
@@ -115,7 +116,7 @@ export default function CreateActivityBtn() {
     <>
       {contextHolder}
       <FloatButton type="primary" tooltip={<div>创建活动</div>} icon={<PlusOutlined />} onClick={() => {form.resetFields(); setIsCreateActivityModalOpen(true)}} />
-      <Modal title="创建活动" open={isCreateActivityModalOpen} loading={submitLoading} onOk={() => form.submit()} onCancel={() => setIsCreateActivityModalOpen(false)}>
+      <Modal width={700} title="创建活动" open={isCreateActivityModalOpen} loading={submitLoading} onOk={() => form.submit()} onCancel={() => setIsCreateActivityModalOpen(false)}>
         <Form form={form} ref={createActivityFormRef} onFinish={onFinish}>
           <Form.Item name="title" label="活动标题" rules={[{ required: true, message: '请输入活动标题' }]}>
             <Input />
@@ -166,8 +167,11 @@ export default function CreateActivityBtn() {
             </Dragger>
           </Form.Item>
           <Form.Item name="description" label="活动描述" rules={[{ required: true, message: '请输��活动描述' }]}>
-            {/* <Input.TextArea rows={4} /> */}
-            <Markdown></Markdown>
+            <MDEditor
+              data-color-mode="light"
+              value={descriptionText}
+              onChange={() => setDescriptionText}
+            />
           </Form.Item>
         </Form>
       </Modal>

@@ -9,7 +9,8 @@ export const SUI_HAI_SERVER_DEVNET = '0x16e2fd4c0f542da2676f6ce3dc83941a1c73c880
 export const SUPABASE_URL = 'https://ecnrrunjqgqplldtqmwy.supabase.co'
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbnJydW5qcWdxcGxsZHRxbXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NDEzMzcsImV4cCI6MjA0ODExNzMzN30.vQ81tt92e8YW-8cq9bLlFrISWnRPihM-8Cm660cIALU'
 
-export const WALRUS_PUBLISHER_TESTNET = 'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100'
+export const WALRUS_PUBLISHER_TESTNET = 'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100'
+//'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100'
 
 export const WALRUS_PUBLISHER = [
   'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100',

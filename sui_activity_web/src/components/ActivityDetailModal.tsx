@@ -1,8 +1,8 @@
 import { Carousel, Modal, Image, Descriptions } from 'antd'
 import { ActivityData } from './ActivityCard'
 import { useSuiClientQuery } from '@mysten/dapp-kit'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import MDEditor from '@uiw/react-md-editor'
 
 interface Props {
   activityDetailModalOpen: boolean
@@ -75,9 +75,14 @@ export default function ActivityDetailModal({
         <Descriptions.Item label="活动地点">{activityDetailData?.location}</Descriptions.Item>
         <Descriptions.Item label="活动费用">{activityDetailData?.join_fee === '0' ? '免费' : `${parseInt(activityDetailData?.join_fee || '0') / 1000000000} SUI`}</Descriptions.Item>
         <Descriptions.Item label="活动人数">总人数：{activityDetailData?.join_memeber.fields.contents.length} 人 / 上限：{activityDetailData?.total_people_num} 人</Descriptions.Item>
-        <Descriptions.Item label="活动描述">{activityDetailData?.description}</Descriptions.Item>
         <Descriptions.Item label="活动评分">{activityDetailData?.score}</Descriptions.Item>
       </Descriptions>
+      <MDEditor
+        data-color-mode="light"
+        value={activityDetailData?.description}
+        hideToolbar
+        preview="preview"
+      />
       {/* 自定义组件插槽 */}
       <div className="mt-5">
         {customFooter}
