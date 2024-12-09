@@ -31,3 +31,27 @@ export const isActivityInProgress = (startStr: string, endStr: string) => {
   }
   return '已结束'
 }
+
+/**
+ * 复制文本
+ * @param text 文本
+ */
+export const copyText = (text: string) => {
+  navigator.clipboard.writeText(text)
+}
+
+/**
+ * 解析location.search为对象
+ */
+export const parseSearch = () => {
+  const search = window.location.search
+  const searchObj: Record<string, string> = {}
+  if (search) {
+    search.substring(1).split('&').forEach((item) => {
+     const [key, value] = item.split('=')
+      searchObj[key] = value
+    })
+    return searchObj
+  }
+  return null
+}

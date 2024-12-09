@@ -1,8 +1,7 @@
 import { useSuiClient, useSuiClientQuery } from '@mysten/dapp-kit'
 import { Divider, Tag } from 'antd'
-import { SUI_HAI_SERVER } from '/@/utils/constants'
 import { useEffect, useState } from 'react'
-import { useNetworkVariable } from '/@/utils/networkConfig'
+import { useNetworkVariable, useNetworkVariables } from '/@/utils/networkConfig'
 import ActivityCard, { ActivityData } from '/@/components/ActivityCard'
 
 // 服务器数据类型
@@ -56,7 +55,7 @@ function HomePage () {
   const [serverData, setServerData] = useState<ServerData>()
   const [activityData, setActivityData] = useState<ActivityData[]>([])
   const [serverDataLoading, setServerDataLoading] = useState(false)
-
+  const { server } = useNetworkVariables()
   /**
    * 查询注册事件
    */
@@ -100,7 +99,7 @@ function HomePage () {
     "multiGetObjects",
     {
       ids:
-        (activityEvents?.data as unknown as ActivityEventData[]).map((item) => item.parsedJson.activity_id) || [],
+      activityEvents?.data && (activityEvents?.data as unknown as ActivityEventData[]).map((item) => item.parsedJson.activity_id) || [],
       options: {
         showContent: true,
       },
@@ -147,7 +146,7 @@ function HomePage () {
   const getServerData = async () => {
     setServerDataLoading(true)
     const { data: sdata, error } = await client.getObject({
-      id: SUI_HAI_SERVER,
+      id: server,
       options: {
         showContent: true
       }

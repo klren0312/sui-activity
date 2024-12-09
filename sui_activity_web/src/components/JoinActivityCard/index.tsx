@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, forwardRef, useImperativeHandle } from 'react'
 import ActivityDetailModal from '../ActivityDetailModal'
 import { Button, message } from 'antd'
 import { useNetworkVariable } from '/@/utils/networkConfig'
@@ -18,15 +18,30 @@ export interface JoinActivityData {
   url: string
 }
 
-interface Props {
-  joinData: JoinActivityData // 参与活动数据
+// 添加导出的方法类型定义
+export interface JoinActivityCardRef {
+  handleCheckIn: () => void
 }
 
-export default function JoinActivityCard({ joinData }: Props) {
+interface Props {
+  joinData: JoinActivityData
+}
+
+// 修改组件定义，使用 forwardRef
+export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard({ joinData }: Props, ref) {
   const [activityDetailModalOpen, setActivityDetailModalOpen] = useState(false)
   const packageId = useNetworkVariable('packageId')
   const { mutate } = useSignAndExecuteTransaction()
   const [messageApi, contextHolder] = message.useMessage()
+
+  // 使用 useImperativeHandle 导出方法
+  useImperativeHandle(ref, () => ({
+    handleCheckIn
+  }))
+
+  /**
+   * 打开活动详情弹窗
+   */
   const handleActivityDetailModalOpen = () => {
     setActivityDetailModalOpen(true)
   }
@@ -86,4 +101,4 @@ export default function JoinActivityCard({ joinData }: Props) {
       }
     </>
   )
-}
+})

@@ -17,6 +17,8 @@ export default function PageLayout() {
   const account = useCurrentAccount()
   const { setJoinActivityList, setActivityListRefetch } = useUserStore()
   const [currentPath, setCurrentPath] = useState('/')
+  const [redirect, setRedirect] = useState('')
+  const chain = account?.chains?.find((c) => c.startsWith('sui:'))?.replace(/^sui:/, '')
 
   // 查找参与的活动
   const { data: joinQueryData, refetch: joinRefetch } = useSuiClientQuery(
@@ -48,8 +50,20 @@ export default function PageLayout() {
    */
   useEffect(() => {
     setActivityListRefetch(joinRefetch)
-    setCurrentPath(window.location.hash.split('#')[1])
+    setCurrentPath(window.location.pathname)
   }, [])
+
+  /**
+   * 监听网络切换
+   */
+  useEffect(() => {
+    if (chain === 'mainnet') {
+      setRedirect(window.location.pathname)
+      router.navigate('/errorNetwork')
+    } else {
+      router.navigate(redirect)
+    }
+  }, [chain])
 
   /**
    * 监听参与活动列表

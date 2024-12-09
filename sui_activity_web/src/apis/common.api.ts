@@ -2,7 +2,7 @@ import { UploadWalrusResponse } from './types/common.type'
 import request from '/@/utils/request'
 // import { getRandomInt } from '/@/utils/tools'
 import mime from 'mime'
-// import { WALRUS_PUBLISHER } from '../utils/constants'
+import { WALRUS_PUBLISHER_TESTNET } from '../utils/constants'
 
 // 上传图片
 export async function UploadImageApi (file: File): Promise<UploadWalrusResponse | null> {
@@ -10,8 +10,7 @@ export async function UploadImageApi (file: File): Promise<UploadWalrusResponse 
   const binary = new Uint8Array(buffer)
   return request({
     method: 'PUT',
-    url: 'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100',
-    // url: 'http://127.0.0.1:31415/v1/store?epochs=100',
+    url: WALRUS_PUBLISHER_TESTNET,
     data: binary,
     headers: {
       'Content-Type': mime.getType(file.name)

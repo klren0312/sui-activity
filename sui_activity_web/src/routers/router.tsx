@@ -1,8 +1,10 @@
 import {
-  createHashRouter,
+  createBrowserRouter,
 } from 'react-router-dom'
 import HomePage from '../pages/HomePage'
 import PersonCenter from '../pages/personCenter'
+import ErrorPage from '../pages/ErrorPage'
+import CheckinPage from '../pages/CheckinPage'
 
 const routes = [
   {
@@ -12,10 +14,18 @@ const routes = [
   {
     path: '/personCenter',
     element: <PersonCenter />,
+  },
+  {
+    path: '/checkin',
+    element: <CheckinPage />,
+  },
+  {
+    path: '/errorNetwork',
+    element: <ErrorPage />,
   }
 ]
 
-const router = createHashRouter(routes, {
+const router = createBrowserRouter(routes, {
   future: {
     v7_fetcherPersist: true,
     v7_normalizeFormMethod: true,

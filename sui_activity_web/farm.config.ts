@@ -18,4 +18,7 @@ export default defineConfig({
     },
     external: ['node:fs']
   },
+  server: {
+    port: 9554
+  }
 })
