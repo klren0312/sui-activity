@@ -5,6 +5,7 @@ import HomePage from '../pages/HomePage'
 import PersonCenter from '../pages/personCenter'
 import ErrorPage from '../pages/ErrorPage'
 import CheckinPage from '../pages/CheckinPage'
+import PointPage from '../pages/PointPage'
 
 const routes = [
   {
@@ -18,6 +19,10 @@ const routes = [
   {
     path: '/checkin',
     element: <CheckinPage />,
+  },
+  {
+    path: '/point',
+    element: <PointPage />,
   },
   {
     path: '/errorNetwork',

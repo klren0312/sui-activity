@@ -105,6 +105,14 @@ export default function PageLayout() {
           >
             个人中心
           </div>
+          <div
+            onClick={() => {setCurrentPath('/point'); router.navigate('/point')}}
+            className={`ml-5 text-white text-base cursor-pointer ${
+              currentPath === '/point' ? 'font-bold' : ''
+            }`}
+          >
+            积分
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <MemberInfo />
