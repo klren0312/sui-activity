@@ -173,7 +173,10 @@ const RegisterForm = forwardRef(() => {
           />
           <div className="flex items-center ml-2 mr-5">欢迎回家，<div className="font-bold text-green-500">{userData.nickname as string}</div></div>
         </div> :
-        <Button className="mr-5" type="primary" onClick={() =>setIsRegisterModalOpen(true)}>申请会员</Button>
+        <Button className="mr-5" type="primary" onClick={() =>{
+          form.resetFields()
+          setIsRegisterModalOpen(true)
+        }}>申请会员</Button>
       }
       <Modal title="申请会员" open={isRegisterModalOpen} onOk={() => form.submit()} onCancel={() => setIsRegisterModalOpen(false)}>
         <Form

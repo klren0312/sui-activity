@@ -1,16 +1,16 @@
 export const MAINNET_PACKAGE_ID = '0x0'
 export const TESTNET_PACKAGE_ID = '0x0'
-export const DEVNET_PACKAGE_ID = '0x0a77fc0daab01b697e4a3f39dc4e19097ac7aa098e4e29d92018feddf506e492'
+export const DEVNET_PACKAGE_ID = '0x6e86e8708883cc1ed55c67fc7dacbac47bc34e69f7d5d83d862f704abde7555c'
 
 export const MAINNET_HAI_SERVER = '0x0'
 export const SUI_HAI_SERVER_TESTNET = '0x0'
-export const SUI_HAI_SERVER_DEVNET = '0x16e2fd4c0f542da2676f6ce3dc83941a1c73c880440cc2a8f37bf65874f34d8f'
+export const SUI_HAI_SERVER_DEVNET = '0x770f7c8f19471ee9ae5aeb93352ddeb0ddeaa8fbfce0e94c52fd31b6d47eed87'
 
 export const SUPABASE_URL = 'https://ecnrrunjqgqplldtqmwy.supabase.co'
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbnJydW5qcWdxcGxsZHRxbXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NDEzMzcsImV4cCI6MjA0ODExNzMzN30.vQ81tt92e8YW-8cq9bLlFrISWnRPihM-8Cm660cIALU'
 
-export const WALRUS_PUBLISHER_TESTNET = 'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100'
-//'https://publisher-walrus.zzes1314.cn/v1/store?epochs=100'
+// export const WALRUS_PUBLISHER_TESTNET = 'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100'
+export const WALRUS_PUBLISHER_TESTNET = 'https://wal-publisher-testnet.staketab.org/v1/store?epochs=100'
 
 export const WALRUS_PUBLISHER = [
   'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100',

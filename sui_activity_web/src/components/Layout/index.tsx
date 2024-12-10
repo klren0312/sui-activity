@@ -70,7 +70,6 @@ export default function PageLayout() {
    */
   useEffect(() => {
     if (joinQueryData && joinQueryData.data.length > 0) {
-      console.log('joinQueryData', joinQueryData)
       const arr = joinQueryData.data.map((item) => {
         if (item?.data?.content?.dataType === 'moveObject') {
           return item.data.content.fields as unknown as JoinActivityData
