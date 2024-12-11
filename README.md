@@ -13,6 +13,35 @@
 ## Demo地址
 [https://sui-hi.walrus.site/](https://sui-hi.walrus.site/)
 
+### 1. 申请会员
+
+https://github.com/user-attachments/assets/d2ba6798-4f31-432b-a379-f6c034e9b2b2
+
+### 2. 创建活动
+
+https://github.com/user-attachments/assets/57e11ad7-3adf-417c-a794-7aa3e613c64f
+
+### 3. 参加活动
+
+https://github.com/user-attachments/assets/808b9243-5f74-4b34-bba0-109f52df83a9
+
+### 4. 活动签到
+
+https://github.com/user-attachments/assets/b6b910de-5d38-409a-b135-395f95907ec2
+
+### 5. 活动评分
+
+https://github.com/user-attachments/assets/b135f1ab-4206-41af-9897-04c9e2d42cb5
+
+### 6. 提取活动经费
+
+https://github.com/user-attachments/assets/640e7ca7-fad4-4fe8-8e0e-6fae35dd4bef
+
+### 7. 积分排名
+
+https://github.com/user-attachments/assets/6bafbd89-e2b3-43a3-b6c0-0d7e537c7b93
+
+
 ## 页面截图
 
 - 首页
