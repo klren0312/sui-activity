@@ -10,9 +10,9 @@ import { Button } from 'antd'
 export default function CheckinPage() {
   const account = useCurrentAccount()
   const packageId = useNetworkVariable('packageId')
-  const [joinActivity, setJoinActivity] = useState<JoinActivityData[]>([])
   const [activityId, setActivityId] = useState('')
   const [currentActivity, setCurrentActivity] = useState<JoinActivityData | null>(null)
+  const [isCheckIn, setIsCheckIn] = useState(false)
   const joinActivityCardRef = useRef<JoinActivityCardRef>(null)
   // 查找参加的活动
   const { data: joinData } = useSuiClientQuery(
@@ -46,14 +46,21 @@ export default function CheckinPage() {
   }, [])
   // 设置参与活动
   useEffect(() => {
-    if (joinData && joinData.data.length > 0) {
-      setJoinActivity(joinData.data.map((item) => {
+    console.log('joinData', joinData)
+    if (joinData) {
+      if (joinData.data.length > 0) {
+        const joinActivity =joinData.data.map((item) => {
         if (item?.data?.content?.dataType === 'moveObject') {
           return item.data.content.fields as unknown as JoinActivityData
         }
         return undefined
-      }).filter((item) => item !== undefined))
-      setCurrentActivity(joinActivity.find((item) => item.activity_id === activityId) || null)
+        }).filter((item) => item !== undefined)
+        setCurrentActivity(joinActivity.find((item) => item.activity_id === activityId) || null)
+      } else {
+        setCurrentActivity(null)
+      }
+    } else {
+      setCurrentActivity(null)
     }
   }, [joinData])
   return (
@@ -61,8 +68,8 @@ export default function CheckinPage() {
       {
         currentActivity ? (
           <div className="flex flex-col items-center">
-            <JoinActivityCard ref={joinActivityCardRef} joinData={currentActivity} />
-            <Button className="mt-4" type="primary" onClick={() => joinActivityCardRef.current?.handleCheckIn()}>签到</Button>
+            <JoinActivityCard ref={joinActivityCardRef} joinData={currentActivity} checkInHandle={() => {setIsCheckIn(true)}} />
+            {isCheckIn ? <div>签到成功</div> : <Button className="mt-4" type="primary" onClick={() => joinActivityCardRef.current?.handleCheckIn()}>签到</Button>}
           </div>
         ) : <div>您没有参与该活动</div>
       }

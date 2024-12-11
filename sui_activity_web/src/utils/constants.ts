@@ -10,7 +10,7 @@ export const SUPABASE_URL = 'https://ecnrrunjqgqplldtqmwy.supabase.co'
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbnJydW5qcWdxcGxsZHRxbXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NDEzMzcsImV4cCI6MjA0ODExNzMzN30.vQ81tt92e8YW-8cq9bLlFrISWnRPihM-8Cm660cIALU'
 
 // export const WALRUS_PUBLISHER_TESTNET = 'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100'
-export const WALRUS_PUBLISHER_TESTNET = 'https://wal-publisher-testnet.staketab.org/v1/store?epochs=100'
+export const WALRUS_PUBLISHER_TESTNET = 'http://127.0.0.1:31415/v1/store?epochs=100'
 
 export const WALRUS_PUBLISHER = [
   'https://publisher.walrus-testnet.walrus.space/v1/store?epochs=100',

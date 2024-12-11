@@ -84,7 +84,7 @@ export default function PageLayout() {
 
   return (
     <Layout>
-      <Header className="page-header flex items-center justify-between px-5">
+      <Header className="page-header flex items-center justify-between px-5 flex-wrap h-auto min-h-16">
         <div className="flex items-center">
           <img className="w-10 h-10" src="/logo-transparent.svg" alt="logo" />
           <div className="page-title ml-5 text-white font-bold text-xl">SuiHi 随嗨</div>

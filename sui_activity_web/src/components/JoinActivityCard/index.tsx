@@ -4,6 +4,7 @@ import { Button, message } from 'antd'
 import { useNetworkVariable } from '/@/utils/networkConfig'
 import { Transaction } from '@mysten/sui/transactions'
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit'
+import { useUserStore } from '/@/stores/user'
 
 export interface JoinActivityData {
   activity_id: string
@@ -25,13 +26,15 @@ export interface JoinActivityCardRef {
 
 interface Props {
   joinData: JoinActivityData
+  checkInHandle: () => void
 }
 
 // 修改组件定义，使用 forwardRef
-export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard({ joinData }: Props, ref) {
+export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard({ joinData, checkInHandle }: Props, ref) {
   const [activityDetailModalOpen, setActivityDetailModalOpen] = useState(false)
   const packageId = useNetworkVariable('packageId')
   const { mutate } = useSignAndExecuteTransaction()
+  const { userData } = useUserStore()
   const [messageApi, contextHolder] = message.useMessage()
 
   // 使用 useImperativeHandle 导出方法
@@ -54,6 +57,7 @@ export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard(
     txb.moveCall({
       target: `${packageId}::activity::check_in`,
       arguments: [
+        txb.object(userData.objectId),
         txb.object(joinData.id.id),
         txb.object(joinData.activity_id)
       ]
@@ -66,6 +70,7 @@ export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard(
         onSuccess: () => {
           Object.assign(joinData, { check_in: true })
           messageApi.success('签到成功')
+          checkInHandle()
         },
         onError: (err) => {
           messageApi.error(err.message)
