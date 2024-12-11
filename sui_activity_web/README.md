@@ -1,37 +1,25 @@
-# Farm + React
+## SuiHai 随嗨 - 前端
 
-This template should help you start developing using React and TypeScript in Farm.
+## 技术栈
+- React
+- Ant Design
+- Zustand
+- TailwindCSS
 
-## Setup
-
-Install the dependencies:
-
+## 项目运行
 ```bash
 pnpm install
+pnpm dev
 ```
 
-## Get Started
-
-Start the dev server:
-
-```bash
-pnpm start
-```
-
-Build the app for production:
-
+## 项目构建
 ```bash
 pnpm build
 ```
 
-Preview the Production build product:
-
-```bash
-pnpm preview
-```
-
-Clear persistent cache local files
-
-```bash
-pnpm clean
-```
+## 项目结构
+项目分为四个页面
+- 首页
+- 个人中心
+- 积分列表
+- 签到页
