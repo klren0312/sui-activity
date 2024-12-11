@@ -98,7 +98,11 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           <div>
             <div>{activity.tag + (parseInt(activity.join_fee) === 0 ? '（免费）' : '（收费）')}</div>
             <div>{activityStatus}</div>
-            <div>评分：{(activity.score / activity.join_memeber.fields.contents.length).toFixed(1)}</div>
+            {
+              activity.score && activity.join_memeber.fields.contents.length > 0 ?
+                <div>评分：{((activity.score / activity.join_memeber.fields.contents.length).toFixed(1))}</div> :
+                <div>评分：0</div>
+            }
           </div>
         }
       >

@@ -26,7 +26,7 @@ if (container) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
+        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
           <WalletProvider
             autoConnect
             stashedWallet={{

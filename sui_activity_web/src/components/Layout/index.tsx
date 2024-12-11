@@ -57,10 +57,11 @@ export default function PageLayout() {
    * 监听网络切换
    */
   useEffect(() => {
-    if (chain === 'mainnet') {
+    if (chain === 'mainnet' || chain === 'devnet') {
       setRedirect(window.location.pathname)
       router.navigate('/errorNetwork')
     } else {
+
       router.navigate(redirect)
     }
   }, [chain])
