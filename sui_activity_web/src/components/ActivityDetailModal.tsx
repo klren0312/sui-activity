@@ -3,7 +3,6 @@ import { ActivityData } from './ActivityCard'
 import { useSignAndExecuteTransaction, useSuiClientQuery } from '@mysten/dapp-kit'
 import { useEffect, useState } from 'react'
 import MDEditor from '@uiw/react-md-editor'
-import { HeartOutlined } from '@ant-design/icons'
 import { Transaction } from '@mysten/sui/transactions'
 import { useNetworkVariable } from '../utils/networkConfig'
 import { useUserStore } from '../stores/user'
@@ -124,10 +123,10 @@ export default function ActivityDetailModal({
             <Rate
               disabled={!(joinActivityIdList.includes(activityDetailData?.id.id || ''))}
               allowHalf
-              character={<HeartOutlined />}
-              defaultValue={activityDetailData?.score ? activityDetailData?.score / activityDetailData?.join_memeber.fields.contents.length : 0}
+              value={parseFloat(activityDetailData?.score ? (activityDetailData?.score / activityDetailData?.join_memeber.fields.contents.length).toFixed(1) : '0')}
               onChange={pushScore}
             />
+            {}
           </Descriptions.Item>
         </Descriptions>
         <MDEditor
