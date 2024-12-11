@@ -1,4 +1,4 @@
-## SuiHai 随嗨 - 前端
+## SuiHi 随嗨 - 前端
 
 ## 技术栈
 - React
