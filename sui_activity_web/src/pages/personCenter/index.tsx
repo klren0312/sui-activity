@@ -205,7 +205,7 @@ export default function PersonCenter() {
               <div className="text-xl font-bold">参与的活动</div>
               <Divider />
               {/* 参与的活动卡片 */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-wrap gap-4">
                 {joinActivity && joinActivity.map((item: JoinActivityData) => (
                   <JoinActivityCard key={item.id.id} joinData={item} />
                 ))}

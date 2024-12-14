@@ -180,16 +180,25 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         customFooter={
           activityDetailData &&
             <div className="w-full mt-5 flex justify-center">
-              {joinActivityIdList && joinActivityIdList.includes(activityDetailData?.id.id) ?
+              {
+                joinActivityIdList && joinActivityIdList.includes(activityDetailData?.id.id) ?
                 <Button disabled>已参加</Button> :
                 activityDetailData && activityDetailData.join_memeber.fields.contents.length >= parseInt(activityDetailData.total_people_num) ?
-                  <Button color="danger" disabled>已满员</Button> :
-                  <Button type="text" onClick={() => joinActivity(activityDetailData?.id.id, activityDetailData?.join_fee)}><UsergroupAddOutlined />
-                    立即参加
-                    <Tag className="flex items-center" icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
-                      {activityDetailData?.join_fee === '0' ? '' : `${parseInt(activityDetailData?.join_fee) / SUI_DECIMALS}`}
-                    </Tag>
-                  </Button>}
+                <Button color="danger" disabled>已满员</Button> :
+                <Button type="text" onClick={() => joinActivity(activityDetailData?.id.id, activityDetailData?.join_fee)}>
+                  <UsergroupAddOutlined />
+                  {
+                    parseInt(activityDetailData.join_fee) === 0 ? '免费参加' : (
+                      <>
+                        立即参加
+                        <Tag className="flex items-center" icon={<img className="w-4 h-4" src='/sui.svg' />} color="#55acee">
+                          {`${parseInt(activityDetailData.join_fee) / SUI_DECIMALS}`}
+                        </Tag>
+                      </>
+                    )
+                  }
+                </Button>
+              }
             </div>
         }
       />

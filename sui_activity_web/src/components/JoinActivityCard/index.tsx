@@ -26,7 +26,7 @@ export interface JoinActivityCardRef {
 
 interface Props {
   joinData: JoinActivityData
-  checkInHandle: () => void
+  checkInHandle?: () => void
 }
 
 // 修改组件定义，使用 forwardRef
@@ -70,7 +70,7 @@ export default forwardRef<JoinActivityCardRef, Props>(function JoinActivityCard(
         onSuccess: () => {
           Object.assign(joinData, { check_in: true })
           messageApi.success('签到成功')
-          checkInHandle()
+          checkInHandle && checkInHandle()
         },
         onError: (err) => {
           messageApi.error(err.message)

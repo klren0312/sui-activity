@@ -92,7 +92,7 @@ export default function ActivityDetailModal({
         width={1200}
         open={activityDetailModalOpen}
         onCancel={() => setActivityDetailModalOpen(false)}
-        title={activityDetailData?.title + '活动详情'}
+        title={activityDetailData?.title + '-活动详情'}
         footer={null}
       >
         <Carousel arrows infinite={false}>
@@ -126,7 +126,6 @@ export default function ActivityDetailModal({
               value={parseFloat(activityDetailData?.score ? (activityDetailData?.score / activityDetailData?.join_memeber.fields.contents.length).toFixed(1) : '0')}
               onChange={pushScore}
             />
-            {}
           </Descriptions.Item>
         </Descriptions>
         <MDEditor
