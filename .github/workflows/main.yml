@@ -3,7 +3,7 @@ name: GitHub Pages
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+      - name: Go To Frontend Folder
+        run: cd sui_activity_web
       - name: Install dependencies
         run: pnpm install
       - name: build
