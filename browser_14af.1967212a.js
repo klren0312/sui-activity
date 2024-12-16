@@ -1,0 +1,1 @@
+(function(_){for(var r in _){_[r].__farm_resource_pot__='browser_14af.js';window['af74950b82d3fdccd0e68beb2043c75f'].__farm_module_system__.register(r,_[r])}})({"78d1ff79":function t(t,e,o,r){"use strict";t.exports=function(){throw Error("ws does not work in the browser. Browser clients must use the native WebSocket object");};},});
