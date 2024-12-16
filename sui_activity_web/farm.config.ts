@@ -17,9 +17,6 @@ export default defineConfig({
       },
     },
     external: ['node:fs'],
-    output: {
-      publicPath: '/sui-hi',
-    }
   },
   server: {
     port: 9554
