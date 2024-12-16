@@ -38,10 +38,10 @@ export default function CheckinPage() {
     },
   )
   useEffect(() => {
-    const searchData = parseSearch()
-    console.log(searchData)
-    if (searchData && searchData.activityId) {
-      setActivityId(searchData.activityId)
+    const activityId = parseSearch()
+    console.log(activityId)
+    if (activityId) {
+      setActivityId(activityId)
     }
   }, [])
   // 设置参与活动

@@ -17,7 +17,7 @@ const routes = [
     element: <PersonCenter />,
   },
   {
-    path: '/checkin',
+    path: '/checkin/:activityId',
     element: <CheckinPage />,
   },
   {

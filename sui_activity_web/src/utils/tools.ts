@@ -44,14 +44,10 @@ export const copyText = (text: string) => {
  * 解析location.search为对象
  */
 export const parseSearch = () => {
-  const search = window.location.search
-  const searchObj: Record<string, string> = {}
-  if (search) {
-    search.substring(1).split('&').forEach((item) => {
-     const [key, value] = item.split('=')
-      searchObj[key] = value
-    })
-    return searchObj
+  const search = window.location.pathname
+  const activityId = search.split('/')[2]
+  if (activityId) {
+    return activityId
   }
   return null
 }

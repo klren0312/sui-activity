@@ -11,7 +11,7 @@ interface QrcodeModalProps {
 export default function QrcodeModal({ open, activityId, onCancel }: QrcodeModalProps) {
   const [url, setUrl] = useState('')
   useEffect(() => {
-    setUrl(`${window.location.origin}/checkin?activityId=${activityId}`)
+    setUrl(`${window.location.origin}/checkin/${activityId}`)
   }, [activityId])
   return (
     <Modal open={open} title="活动签到二维码" onCancel={onCancel} footer={null}>

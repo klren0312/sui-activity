@@ -42,6 +42,7 @@ export default function PageLayout() {
     },
     {
       gcTime: 10000,
+      refetchInterval: 10000,
     },
   )
 
