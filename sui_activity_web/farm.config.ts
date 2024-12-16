@@ -16,7 +16,10 @@ export default defineConfig({
         '/@/': path.join(process.cwd(), 'src')
       },
     },
-    external: ['node:fs']
+    external: ['node:fs'],
+    output: {
+      publicPath: '/sui-hi',
+    }
   },
   server: {
     port: 9554
