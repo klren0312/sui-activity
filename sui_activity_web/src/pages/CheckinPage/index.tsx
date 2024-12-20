@@ -55,7 +55,9 @@ export default function CheckinPage() {
         }
         return undefined
         }).filter((item) => item !== undefined)
-        setCurrentActivity(joinActivity.find((item) => item.activity_id === activityId) || null)
+        const current = joinActivity.find((item) => item.activity_id === activityId)
+        setIsCheckIn(current?.check_in || false)
+        setCurrentActivity(current || null)
       } else {
         setCurrentActivity(null)
       }

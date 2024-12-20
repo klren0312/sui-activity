@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
 } from 'react-router-dom'
 import HomePage from '../pages/HomePage'
 import PersonCenter from '../pages/personCenter'
@@ -30,7 +30,7 @@ const routes = [
   }
 ]
 
-const router = createBrowserRouter(routes, {
+const router = createHashRouter(routes, {
   future: {
     v7_fetcherPersist: true,
     v7_normalizeFormMethod: true,

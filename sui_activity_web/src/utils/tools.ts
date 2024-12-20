@@ -44,8 +44,7 @@ export const copyText = (text: string) => {
  * 解析location.search为对象
  */
 export const parseSearch = () => {
-  const search = window.location.pathname
-  const activityId = search.split('/')[2]
+  const activityId = location.hash.split('#/checkin/')[1]
   if (activityId) {
     return activityId
   }
